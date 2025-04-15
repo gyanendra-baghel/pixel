@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: opl1;
+    src: url(./assets//file.woff2);
+  }
+  @font-face {
+    font-family: diff opl2;
+    src: url(./assets/madefor-text.var.original.woff2);
+  }
+  @font-face {
+    font-family: opl2;
+    src: url(./assets/file2.woff2);
+  }
+  @font-face {
+    font-family: opl3;
+    src: url(./assets/file3.woff2);
+  }
+  @font-face {
+    font-family: opl4;
+    src: url(./assets/file4.woff2);
+  }
+  @font-face {
+    font-family: opl5;
+    src: url(./assets/file5.woff2);
+  }

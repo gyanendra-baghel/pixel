@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+psycopg2-binary
+qdrant-client
+python-dotenv
+opencv-python-headless
+insightface
+numpy
+onnxruntime
+python-multipart
