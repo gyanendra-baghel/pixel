@@ -7,13 +7,19 @@ import {
   faCalendarDays,
   faBars,
 } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 function Header({ toggleSidebar }) {
   const [isOpen, setIsOpen] = useState(false);
   const toggleForIsOpen = () => setIsOpen(!isOpen);
 
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }
+
   return (
-    <>  
+    <>
       <header className="fixed top-0 left-0 right-0 w-full bg-white shadow-md z-50">
         <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-3">
           <div className="flex items-center gap-4">
@@ -29,10 +35,12 @@ function Header({ toggleSidebar }) {
           </div>
 
           <div className="flex items-center gap-6">
-            <FontAwesomeIcon
-              icon={faPlus}
-              className="text-xl text-gray-600 cursor-pointer hover:text-gray-800"
-            />
+            <Link to="/upload">
+              <FontAwesomeIcon
+                icon={faPlus}
+                className="text-xl text-gray-600 cursor-pointer hover:text-gray-800"
+              />
+            </Link>
             <img
               className="rounded-full w-10 h-10 object-cover cursor-pointer"
               src={user}
@@ -48,7 +56,7 @@ function Header({ toggleSidebar }) {
               <p className="font-semibold">Prathit Dode</p>
               <p className="text-gray-500">prathitdode@gmail.com</p>
             </div>
-            <div>
+            <div onClick={handleSignOut}>
               <p className="p-4 font-bold text-red-600 cursor-pointer hover:text-red-800 transition-all flex items-center gap-2">
                 <FontAwesomeIcon
                   icon={faCircleXmark}

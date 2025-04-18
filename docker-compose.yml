@@ -6,6 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: vision_db
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -19,44 +20,42 @@ services:
       - qdrant_data:/qdrant/storage
     
   auth-service:
-    build: ./auth
+    build: ./apps/auth-service
     ports:
-      - "5000:5000"
-    volumes:
-      - ./auth:/app
+      - "5001:5001"
     environment:
-      - PORT=5000
+      - PORT=5001
       - JWT_SECRET=your_jwt_secret
       - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/auth_db
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/vision_db
       - FRONTEND_URL=http://localhost:5173
     depends_on:
       - postgres
 
   image-service:
-    build: ./image
+    build: ./apps/image-service
     ports:
-      - "5001:5001"
+      - "5002:5002"
     volumes:
       - ./image:/app
       - image_data:/app/uploads
     environment:
-      - PORT=5001
+      - PORT=5002
       - JWT_SECRET=your_jwt_secret
       - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/upload_db
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/vision_db
     depends_on:
       - postgres
 
   face-service:
-    build: ./face-similarity
+    build: ./apps/face-service
     ports:
-      - "5002:5002"
+      - "5003:5003"
     environment:
-      - PORT=5002
+      - PORT=5003
       - JWT_SECRET=your_jwt_secret
       - PYTHON_ENV=development
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/face_db
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/vision_db
       - QDRANT_URL=http://qdrant:6333
       - QDRANT_HOST=qdrant
     depends_on:

@@ -23,7 +23,7 @@ app.use('/thumbnails', express.static(path.join(__dirname, '../thumbnails')));
 // Routes
 app.use('/api/images', imageRoutes);
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
   console.log(`Image Service running on port ${PORT}`);
 });

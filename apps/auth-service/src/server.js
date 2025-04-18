@@ -4,6 +4,7 @@ import helmet from "helmet";
 import { prisma } from "./config/prisma.js";
 import { getEnv } from "./utils/getEnv.js";
 import authRoutes from "./routes/authRoutes.js"
+import errorMiddleware from "./utils/errorMiddleware.js";
 
 const app = express();
 
@@ -15,13 +16,16 @@ app.use(cors({
   credentials: true, // optional, useful if you're sending cookies or auth headers
 }));
 app.use(helmet());
+app.use(express.urlencoded({ extended: true }));
 
-
-console.log("Frontend URL:", getEnv("FRONTEND_URL"));
-
+// Routes
+app.get("/", (req, res) => {
+  res.send("Auth service is running");
+});
 app.use('/api/auth', authRoutes);
 
-const PORT = process.env.PORT || 5000;
+// Middleware
+app.use(errorMiddleware);
 
 // prisma.$connect().then(() => {
 app.listen(getEnv("PORT"), async () => {

@@ -17,13 +17,13 @@ const FullImage = () => {
   const toggle = () => setIsShare(!isShare);
 
   if (!photo) {
-    return <p>First upload an image, then open!</p>;
+    return <p>First click an image, then open!</p>;
   }
 
-  
+
   const shareUrl = `${window.location.origin}${photo.url}`;
 
-  
+
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -49,14 +49,14 @@ const FullImage = () => {
       {isShare && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="relative bg-white shadow-lg rounded-lg p-6 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 w-0 sm:w-96">
-            
-            <FontAwesomeIcon 
-              icon={faXmark}  
+
+            <FontAwesomeIcon
+              icon={faXmark}
               onClick={toggle}
               className="absolute top-2 left-2 text-xl cursor-pointer"
             />
 
-       
+
             <div className="flex flex-col pt-5 items-center">
               <LinkedinShareButton url={shareUrl}>
                 <img src={linkedinLogo} alt="LinkedIn" className="w-12 h-12" />
@@ -64,7 +64,7 @@ const FullImage = () => {
               <p className="text-sm font-medium">LinkedIn</p>
             </div>
 
-        
+
             <div className="flex flex-col pt-5 items-center">
               <TwitterShareButton url={shareUrl} title="Check out this image!">
                 <img src={xLogo} alt="X" className="w-12 h-12" />
@@ -72,7 +72,7 @@ const FullImage = () => {
               <p className="text-sm font-medium">X</p>
             </div>
 
-          
+
             <div className="flex flex-col pt-5 items-center">
               <WhatsappShareButton url={shareUrl} title="Check out this image!">
                 <img src={waLogo} alt="WhatsApp" className="w-12 h-12" />
@@ -80,7 +80,7 @@ const FullImage = () => {
               <p className="text-sm font-medium">WhatsApp</p>
             </div>
 
-           
+
             <div className="flex flex-col pt-5 items-center">
               <button onClick={copyToClipboard} className="bg-gray-200 p-2 rounded-lg hover:bg-gray-300">
                 <FontAwesomeIcon icon={faCopy} className="text-lg" />

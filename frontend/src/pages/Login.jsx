@@ -4,7 +4,7 @@ import axiosInstance from '../utils/api'; // Import axios instance
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,16 +18,14 @@ const LoginPage = () => {
     try {
       // Send login request
       const response = await axiosInstance.post('/api/auth/login/', {
-        username,
+        email,
         password,
       });
 
-      const { access, refresh, user } = response.data;
+      const { token } = response.data;
 
       // Save tokens to localStorage
-      localStorage.setItem('accessToken', access);
-      localStorage.setItem('refreshToken', refresh);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token);
 
       // Redirect to another page or update UI
       // For example, redirect to the dashboard
@@ -45,10 +43,10 @@ const LoginPage = () => {
       <h2 className="text-xl font-semibold mb-4">Login</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 border rounded"
           required
         />
