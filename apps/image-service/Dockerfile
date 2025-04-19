@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the files
-COPY . .
+COPY . . 
 
 # Expose port (e.g., 5002)
 EXPOSE 5002

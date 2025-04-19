@@ -11,12 +11,10 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the files
-COPY . .
+COPY server.js ./
 
-# Expose port (e.g., 5001)
-EXPOSE 5001
+# Expose port (e.g., 5000)
+EXPOSE 5000
 
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Start the service
+CMD ["npm", "start"]
