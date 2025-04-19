@@ -6,10 +6,14 @@ import { getEnv } from "../utils/getEnv.js"
 export const register = async (req, res) => {
   const { name, email, password, role } = req.body;
 
+  if (!name || !email || !password || !["admin", "user"].includes(role)) {
+    return res.status(400).json({ message: 'Invalid format credentials' });
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
-    data: { name, email, password: hashedPassword, role: role || 'free' }
+    data: { name, email, password: hashedPassword, role }
   });
 
   res.status(201).json({ message: 'User registered successfully', user });
@@ -18,21 +22,24 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Invalid format credentials' });
+  }
+
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return res.status(400).json({ message: 'User not found' });
 
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) return res.status(400).json({ message: 'Invalid credentials' });
 
-  const token = jwt.sign({ id: user.id, role: user.role }, getEnv("JWT_SECRET"), { expiresIn: '1h' });
+  const token = jwt.sign({ id: user.id, role: user.role }, getEnv("JWT_SECRET"), { expiresIn: '3h' });
 
-  res.json({ message: 'Login successful', token });
+  res.json({ message: 'Login successful', token, role: user.role });
 };
 
 
 export const getUser = async (req, res) => {
   const user = req.user;
-
   if (!user) {
     throw new Error('User not found');
   }
