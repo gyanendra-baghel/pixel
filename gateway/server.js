@@ -5,37 +5,17 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 const app = express();
 app.use(cors());
 
-// 🧠 JSON parsing middleware for APIs that need it
-app.use((req, res, next) => {
-  const contentType = req.headers['content-type'] || '';
-  if (contentType.includes('application/json')) {
-    express.json()(req, res, next);
-  } else {
-    next();
-  }
-});
-
 // 📦 Proxy helper
 const createServiceProxy = (target) => createProxyMiddleware({
   target,
   changeOrigin: true,
-  // pathRewrite: {
-  //   '^/api/auth': '',      // for auth-service
-  //   '^/api/images': '',    // for image-service
-  // },
-  onProxyReq: (proxyReq, req, res) => {
-    // Preserve raw body for multipart/form-data uploads
-    if (req.body && !Buffer.isBuffer(req.body)) {
-      const bodyData = JSON.stringify(req.body);
-      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-      proxyReq.write(bodyData);
-    }
-  },
+  timeout: 5000,
 });
 
 // 🔄 Proxy routes
 app.use('/api/auth', createServiceProxy('http://auth-service:5001/api/auth'));
-app.use('/api/images', createServiceProxy('http://image-service:5002/api/images'));
+app.use('/api/storage', createServiceProxy('http://storage-service:5002/api/storage'));
+app.use('/api/gallery', createServiceProxy('http://gallery-service:5003/api/gallery'));
 
 // 🚨 Fallback Error Handler
 app.use((err, req, res, next) => {

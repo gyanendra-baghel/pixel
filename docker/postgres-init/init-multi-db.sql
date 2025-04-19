@@ -1,3 +1,3 @@
 CREATE DATABASE auth_db;
-CREATE DATABASE image_db;
+CREATE DATABASE storage_db;
 CREATE DATABASE gallery_db;

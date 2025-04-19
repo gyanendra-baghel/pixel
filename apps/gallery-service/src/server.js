@@ -12,9 +12,9 @@ app.use(cors());
 app.use(express.json()); // Middleware to parse JSON request bodies
 
 // Routes
-app.use('/api/galleries', authenticateUser, galleryRoutes);
-app.use('/api/images', authenticateUser, imageRoutes);
-app.use('/api/access', authenticateUser, accessRoutes);
+app.use('/api/gallery', authenticateUser, galleryRoutes);
+app.use('/api/gallery/images', authenticateUser, imageRoutes);
+app.use('/api/gallery/access', authenticateUser, accessRoutes);
 
 // Global error handler for unhandled routes or errors
 app.use((err, req, res, next) => {

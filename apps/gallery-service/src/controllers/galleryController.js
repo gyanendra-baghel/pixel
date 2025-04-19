@@ -14,7 +14,9 @@ export const createGallery = async (req, res) => {
 
 export const getAllGalleries = async (req, res) => {
   try {
-    const galleries = await prisma.gallery.findMany();
+    const galleries = await prisma.gallery.findMany({
+      where: { createdById: req.user.id },
+    });
     res.json(galleries);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch galleries' });

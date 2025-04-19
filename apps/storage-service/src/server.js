@@ -21,7 +21,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/thumbnails', express.static(path.join(__dirname, '../thumbnails')));
 
 // Routes
-app.use('/api/images', imageRoutes);
+app.use('/api/storage', imageRoutes);
 
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
