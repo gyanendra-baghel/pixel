@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Gallery {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  createdBy   String      // admin user_id
+
+  images      Image[]
+  accessList  UserAccess[]
+}
+
+model Image {
+  id          String   @id @default(uuid())
+  filename    String
+  fileUrl     String    // Path on disk or URL from storage service
+  status      ImageStatus @default(PENDING) // PENDING | APPROVED | REJECTED
+  uploadedAt  DateTime @default(now())
+
+  uploadedBy  String    // user/admin user_id
+
+  galleryId   String
+  gallery     Gallery   @relation(fields: [galleryId], references: [id])
+
+  reviewNote  String?
+  reviewedAt  DateTime?
+  reviewedBy  String?
+}
+
+model UserAccess {
+  id        String    @id @default(uuid())
+  userId    String    // user_id
+  galleryId String    // gallery_id
+  canUpload Boolean   @default(false)
+  canView   Boolean   @default(true)
+
+  gallery   Gallery   @relation(fields: [galleryId], references: [id])
+
+  @@unique([userId, galleryId]) // Ensure unique access per user per gallery
+}
+
+enum ImageStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

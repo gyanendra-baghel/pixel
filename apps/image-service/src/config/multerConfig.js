@@ -1,10 +1,12 @@
 import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 // Storage Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const userId = req.user.id; // Make sure req.user is populated (e.g., via auth middleware)
-    const userDir = path.join('uploads', userId.toString());
+    const userDir = '/uploads/' + userId.toString();
 
     // Create directory if it doesn't exist
     fs.mkdirSync(userDir, { recursive: true });

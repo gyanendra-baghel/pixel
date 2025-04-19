@@ -11,25 +11,31 @@ export const uploadImage = async (req, res) => {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   const userId = req.user.id;
-
   const originalPath = req.file.path;
+  console.log(originalPath);
   const filename = path.basename(originalPath);
-  const thumbnailPath = `thumbnails/${userId}/${filename}`;
 
-  try {
-    // Generate Thumbnail (200x200)
-    await sharp(originalPath)
-      .resize(200, 200)
-      .toFile(thumbnailPath);
+  res.json({
+    message: 'Image uploaded successfully',
+    original: `/uploads/${userId}/${filename}`,
+  });
 
-    res.json({
-      message: 'Image uploaded successfully',
-      original: `/uploads/${userId}/${filename}`,
-      thumbnail: `/thumbnails/${userId}/${filename}`
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error processing image', error: error.message });
-  }
+  // const thumbnailPath = `thumbnails/${userId}/${filename}`;
+
+  // try {
+  //   // Generate Thumbnail (200x200)
+  //   await sharp(originalPath)
+  //     .resize(200, 200)
+  //     .toFile(thumbnailPath);
+
+  //   res.json({
+  //     message: 'Image uploaded successfully',
+  //     original: `/uploads/${userId}/${filename}`,
+  //     thumbnail: `/thumbnails/${userId}/${filename}`
+  //   });
+  // } catch (error) {
+  //   res.status(500).json({ message: 'Error processing image', error: error.message });
+  // }
 };
 
 // Get Uploaded Image
@@ -40,7 +46,8 @@ export const getImage = (req, res) => {
 
   const userId = req.user.id;
 
-  const imagePath = path.join(__dirname, `../../uploads/${userId}`, req.params.filename);
+  const imagePath = '/uploads/' + userId.toString() + '/' + req.params.filename;
+  console.log(imagePath);
   if (fs.existsSync(imagePath)) {
     res.sendFile(imagePath);
   } else {
