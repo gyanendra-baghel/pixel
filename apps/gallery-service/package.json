@@ -1,0 +1,25 @@
+{
+  "name": "gallery-service",
+  "version": "1.0.0",
+  "description": "This service handles the gallery and image management system for the platform. It allows for creating galleries, submitting images, reviewing images, and controlling user access.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.2",
+    "prisma": "^6.6.0"
+  }
+}

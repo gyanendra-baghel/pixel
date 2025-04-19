@@ -1,19 +1,13 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-dotenv.config();
+import { getEnv } from '../utils/getEnv.js';
 
 export const authenticateUser = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Unauthorized: Missing token' });
-  }
+  const token = req.header('Authorization');
+  if (!token) return res.status(401).json({ message: 'Access Denied' });
 
-  const token = authHeader.split(' ')[1];
-  try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
+  jwt.verify(token, getEnv("JWT_SECRET"), (err, user) => {
+    if (err) return res.status(403).json({ message: 'Invalid Token' });
     req.user = user;
     next();
-  } catch (err) {
-    res.status(403).json({ message: 'Invalid token' });
-  }
+  });
 };

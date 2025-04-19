@@ -1,5 +1,5 @@
 # Use official Node.js image from Docker Hub
-FROM node:16
+FROM node:18
 
 # Set working directory in the container
 WORKDIR /app
@@ -14,7 +14,9 @@ RUN npm install
 COPY . .
 
 # Expose port for the application
-EXPOSE 5000
+EXPOSE 5003
 
-# Command to run the app
-CMD ["node", "src/app.js"]
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]

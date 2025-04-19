@@ -29,7 +29,7 @@ services:
       - PORT=5001
       - JWT_SECRET=your_jwt_secret
       - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/vision_db
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/auth_db
       - FRONTEND_URL=http://localhost:5173
     networks:
       - backend
@@ -44,7 +44,7 @@ services:
       - PORT=5002
       - JWT_SECRET=your_jwt_secret
       - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/vision_db
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/image_db
     volumes:
       - image_data:/app/uploads
     networks:
@@ -56,8 +56,9 @@ services:
     build: ./apps/gallery-service
     environment:
       - PORT=5003
-      - DATABASE_URL=postgresql://user:password@db:5432/gallerydb?schema=public
-      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_SECRET=your_jwt_secret
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/gallery_db
     ports:
       - "5003:5003"
     networks:
@@ -70,7 +71,7 @@ services:
   #   ports:
   #     - "5004:5004"
   #   environment:
-  #     - PORT=5003
+  #     - PORT=5004
   #     - JWT_SECRET=your_jwt_secret
   #     - PYTHON_ENV=development
   #     - DATABASE_URL=postgres://postgres:password@postgres:5432/vision_db
