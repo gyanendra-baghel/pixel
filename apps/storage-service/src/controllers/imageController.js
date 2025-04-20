@@ -17,7 +17,7 @@ export const uploadImage = async (req, res) => {
 
   res.json({
     message: 'Image uploaded successfully',
-    original: `/uploads/${userId}/${filename}`,
+    original: `/${userId}/${filename}`,
   });
 
   // const thumbnailPath = `thumbnails/${userId}/${filename}`;
@@ -40,17 +40,19 @@ export const uploadImage = async (req, res) => {
 
 // Get Uploaded Image
 export const getImage = (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  console.log("Params: " + req.params.userId + "User id" + req?.user?.id)
+  const userId = req?.user?.id || req?.params?.userId;
+  if (!userId) {
+    return res.status(401).json({ message: 'Unauthorized', userId });
   }
-
-  const userId = req.user.id;
 
   const imagePath = '/uploads/' + userId.toString() + '/' + req.params.filename;
   console.log(imagePath);
   if (fs.existsSync(imagePath)) {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
     res.sendFile(imagePath);
   } else {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
     res.status(404).json({ message: 'Image not found' });
   }
 };

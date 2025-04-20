@@ -6,8 +6,8 @@ export const grantAccess = async (req, res) => {
 
     const access = await prisma.galleryAccess.create({
       data: {
-        userId: parseInt(userId),
-        galleryId: parseInt(galleryId),
+        userId: userId,
+        galleryId: galleryId,
       },
     });
 
@@ -19,7 +19,15 @@ export const grantAccess = async (req, res) => {
 
 export const getUserAccessGalleries = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const userId = req.user.id;
+
+    if (req.user.role.toUpperCase() == "ADMIN") {
+      const galleries = await prisma.gallery.findMany();
+      return res.json(galleries);
+    }
 
     const accesses = await prisma.galleryAccess.findMany({
       where: { userId },
@@ -27,6 +35,7 @@ export const getUserAccessGalleries = async (req, res) => {
     });
 
     res.json(accesses.map(a => a.gallery));
+
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch user access galleries' });
   }

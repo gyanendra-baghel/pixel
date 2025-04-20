@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Upload,
   X,
@@ -10,30 +10,69 @@ import {
   Image as ImageIcon,
   FileX,
   Trash2
-} from 'lucide-react';
-import axiosInstance from '../utils/api';
+} from "lucide-react";
 
-const UploadPage = () => {
+export default function MyUploads() {
   const navigate = useNavigate();
-  const { galleryId } = useParams(); // Get galleryId from route
   const [uploads, setUploads] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedGallery, setSelectedGallery] = useState("");
+  const [galleries, setGalleries] = useState([]);
   const fileInputRef = useRef(null);
 
   // Check if user is authenticated
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      navigate('/login');
+      navigate("/login");
     }
 
-    // Fetch user uploads, filtered by galleryId
-  }, [navigate, galleryId]);
+    // Fetch user uploads
+    // fetchUserUploads();
+
+    // // Fetch galleries
+    // fetchGalleries();
+  }, [navigate]);
+
+  // Fetch user uploads
+  const fetchUserUploads = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get("/api/uploads", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      setUploads(response.data);
+    } catch (err) {
+      console.error("Error fetching uploads:", err);
+      setError("Failed to load your uploads. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch galleries
+  const fetchGalleries = async () => {
+    try {
+      const response = await axios.get("/api/galleries", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      setGalleries(response.data);
+      if (response.data.length > 0) {
+        setSelectedGallery(response.data[0].id);
+      }
+    } catch (err) {
+      console.error("Error fetching galleries:", err);
+    }
+  };
 
   // Handle file selection
   const handleFileSelect = (event) => {
-    const files = Array.from(event.target.files || []);
+    const files = Array.from(event.target.files);
 
     if (files.length === 0) return;
 
@@ -56,7 +95,7 @@ const UploadPage = () => {
 
     // Reset file input
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -68,7 +107,7 @@ const UploadPage = () => {
       file,
       filename: file.name,
       progress: 0,
-      status: 'uploading',
+      status: "uploading",
       error: null
     };
 
@@ -77,14 +116,15 @@ const UploadPage = () => {
 
     // Create form data
     const formData = new FormData();
-    formData.append('image', file);
-    formData.append('galleryId', galleryId);
+    formData.append("file", file);
+    formData.append("galleryId", selectedGallery);
 
     try {
       // Upload file with progress tracking
-      const response = await axiosInstance.post('/api/gallery/images/', formData, {
+      const response = await axios.post("/api/upload", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
         },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -101,17 +141,16 @@ const UploadPage = () => {
       });
 
       // Update upload status on completion
-      const { id, fileUrl, uploadedAt, galleryId: resGalleryId } = response.data;
       setUploads(prev =>
         prev.map(item =>
           item.id === uploadItem.id
             ? {
               ...item,
-              status: 'complete',
-              id, // Replace temp id with server id
-              fileUrl,
-              uploadedAt,
-              galleryId: resGalleryId,
+              status: "complete",
+              id: response.data.id, // Replace temp id with server id
+              fileUrl: response.data.fileUrl,
+              uploadedAt: response.data.uploadedAt,
+              galleryId: response.data.galleryId,
               progress: 100
             }
             : item
@@ -119,7 +158,7 @@ const UploadPage = () => {
       );
 
     } catch (err) {
-      console.error('Upload error:', err);
+      console.error("Upload error:", err);
 
       // Update upload status on error
       setUploads(prev =>
@@ -127,8 +166,8 @@ const UploadPage = () => {
           item.id === uploadItem.id
             ? {
               ...item,
-              status: 'error',
-              error: err.response?.data?.message || 'Upload failed'
+              status: "error",
+              error: err.response?.data?.message || "Upload failed"
             }
             : item
         )
@@ -143,12 +182,12 @@ const UploadPage = () => {
       try {
         await axios.delete(`/api/uploads/${uploadId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`
           }
         });
       } catch (err) {
-        console.error('Error deleting upload:', err);
-        setError('Failed to delete upload. Please try again.');
+        console.error("Error deleting upload:", err);
+        setError("Failed to delete upload. Please try again.");
         return;
       }
     }
@@ -159,58 +198,58 @@ const UploadPage = () => {
 
   // Format date
   const formatDate = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   // Get status display
   const getStatusDisplay = (status) => {
     switch (status) {
-      case 'APPROVED':
+      case "APPROVED":
         return {
-          label: 'Approved',
-          color: 'bg-green-500',
+          label: "Approved",
+          color: "bg-green-500",
           icon: <Check size={16} className="text-green-500" />
         };
-      case 'REJECTED':
+      case "REJECTED":
         return {
-          label: 'Rejected',
-          color: 'bg-red-500',
+          label: "Rejected",
+          color: "bg-red-500",
           icon: <X size={16} className="text-red-500" />
         };
-      case 'PENDING':
+      case "PENDING":
         return {
-          label: 'Pending Review',
-          color: 'bg-yellow-500',
+          label: "Pending Review",
+          color: "bg-yellow-500",
           icon: <AlertCircle size={16} className="text-yellow-500" />
         };
-      case 'uploading':
+      case "uploading":
         return {
-          label: 'Uploading...',
-          color: 'bg-blue-500',
+          label: "Uploading...",
+          color: "bg-blue-500",
           icon: <Loader size={16} className="text-blue-500 animate-spin" />
         };
-      case 'complete':
+      case "complete":
         return {
-          label: 'Upload Complete',
-          color: 'bg-green-500',
+          label: "Upload Complete",
+          color: "bg-green-500",
           icon: <Check size={16} className="text-green-500" />
         };
-      case 'error':
+      case "error":
         return {
-          label: 'Upload Failed',
-          color: 'bg-red-500',
+          label: "Upload Failed",
+          color: "bg-red-500",
           icon: <FileX size={16} className="text-red-500" />
         };
       default:
         return {
           label: status,
-          color: 'bg-gray-500',
+          color: "bg-gray-500",
           icon: null
         };
     }
@@ -229,8 +268,6 @@ const UploadPage = () => {
           <AlertCircle size={20} className="mr-2" />
           <span>{error}</span>
           <button
-            variant="ghost"
-            size="icon"
             onClick={() => setError(null)}
             className="ml-auto text-red-700 hover:text-red-900"
           >
@@ -241,10 +278,33 @@ const UploadPage = () => {
 
       {/* Upload form */}
       <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="mb-4">
+          <label htmlFor="gallery" className="block text-sm font-medium text-gray-700 mb-1">
+            Select Gallery
+          </label>
+          <select
+            id="gallery"
+            value={selectedGallery}
+            onChange={(e) => setSelectedGallery(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+            disabled={galleries.length === 0}
+          >
+            {galleries.length === 0 ? (
+              <option>No galleries available</option>
+            ) : (
+              galleries.map(gallery => (
+                <option key={gallery.id} value={gallery.id}>
+                  {gallery.name}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+
         <div className="mt-4">
           <div
             className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => fileInputRef.current.click()}
           >
             <Upload size={36} className="mx-auto text-gray-400 mb-2" />
             <p className="text-gray-700 font-medium">Click to select images or drag and drop</p>
@@ -265,10 +325,10 @@ const UploadPage = () => {
       <div className="space-y-4">
         <h3 className="text-xl font-bold text-gray-800">Current Uploads</h3>
 
-        {uploads.filter(upload => upload.status === 'uploading' || upload.status === 'error').length > 0 && (
+        {uploads.filter(upload => upload.status === "uploading" || upload.status === "error").length > 0 && (
           <div className="space-y-4">
             {uploads
-              .filter(upload => upload.status === 'uploading' || upload.status === 'error')
+              .filter(upload => upload.status === "uploading" || upload.status === "error")
               .map(upload => {
                 const statusInfo = getStatusDisplay(upload.status);
 
@@ -283,17 +343,15 @@ const UploadPage = () => {
                         <h4 className="font-medium text-gray-800 truncate" title={upload.filename}>
                           {upload.filename}
                         </h4>
-                        {/* <button
-                          variant="ghost"
-                          size="icon"
+                        <button
                           onClick={() => removeUpload(upload.id)}
                           className="text-gray-400 hover:text-gray-600"
                         >
                           <X size={18} />
-                        </button> */}
+                        </button>
                       </div>
 
-                      {upload.status === 'uploading' && (
+                      {upload.status === "uploading" && (
                         <div className="mt-2">
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
@@ -308,10 +366,10 @@ const UploadPage = () => {
                         </div>
                       )}
 
-                      {upload.status === 'error' && (
+                      {upload.status === "error" && (
                         <div className="mt-1 text-sm text-red-600 flex items-center">
                           <AlertCircle size={16} className="mr-1" />
-                          {upload.error || 'Upload failed'}
+                          {upload.error || "Upload failed"}
                         </div>
                       )}
                     </div>
@@ -330,7 +388,7 @@ const UploadPage = () => {
             <Loader className="animate-spin mr-2" size={24} />
             <span>Loading your uploads...</span>
           </div>
-        ) : uploads.filter(upload => upload.status !== 'uploading' && upload.status !== 'error').length === 0 ? (
+        ) : uploads.filter(upload => upload.status !== "uploading" && upload.status !== "error").length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <ImageIcon size={48} className="mx-auto text-gray-400 mb-3" />
             <p className="text-gray-500">You haven't uploaded any images yet</p>
@@ -338,7 +396,7 @@ const UploadPage = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {uploads
-              .filter(upload => upload.status !== 'uploading' && upload.status !== 'error')
+              .filter(upload => upload.status !== "uploading" && upload.status !== "error")
               .map(upload => {
                 const statusInfo = getStatusDisplay(upload.status);
 
@@ -349,29 +407,26 @@ const UploadPage = () => {
                   >
                     <div className="relative h-48">
                       <img
-                        src={`http://localhost:5002${upload.fileUrl}`}
+                        src={`${process.env.REACT_APP_API_URL || ""}${upload.fileUrl}` || "/placeholder.svg"}
                         alt={upload.filename}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = '/placeholder.svg';
+                          e.target.src = "/placeholder.svg";
                         }}
                       />
                       <div className="absolute top-2 right-2">
-                        <span className={
-                          'inline-block px-2 py-1 text-xs font-medium rounded-full'}>
+                        <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusInfo.color.replace("bg-", "bg-opacity-75 text-")}`}>
                           {statusInfo.label}
                         </span>
                       </div>
-                      {/* <button
-                        variant="ghost"
-                        size="icon"
+                      <button
                         onClick={() => removeUpload(upload.id, true)}
                         className="absolute bottom-2 right-2 p-1 bg-red-500 bg-opacity-75 rounded-full text-white hover:bg-opacity-100 transition-opacity"
                         title="Delete image"
                       >
                         <Trash2 size={18} />
-                      </button> */}
+                      </button>
                     </div>
                     <div className="p-4">
                       <h3 className="font-medium text-gray-800 truncate" title={upload.filename}>
@@ -395,6 +450,4 @@ const UploadPage = () => {
       </div>
     </div>
   );
-};
-
-export default UploadPage;
+}

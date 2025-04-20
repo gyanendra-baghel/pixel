@@ -6,10 +6,12 @@ import accessRoutes from './routes/accessRoutes.js';
 import { authenticateUser } from './middleware/authMiddleware.js';
 import { getEnv } from './utils/getEnv.js';
 import prisma from './config/prismaClient.js';
+import fileUpload from 'express-fileupload';
 
 const app = express();
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON request bodies
+app.use(fileUpload());
 
 // Routes
 app.use('/api/gallery', authenticateUser, galleryRoutes);

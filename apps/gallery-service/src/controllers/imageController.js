@@ -2,19 +2,24 @@ import prisma from '../config/prismaClient.js';
 
 export const submitImage = async (req, res) => {
   try {
-    const { galleryId, storagePath } = req.body;
+    if (!req.body) {
+      throw new Error('No request body provided');
+    }
+    const { galleryId } = req.body;
 
     const image = await prisma.image.create({
       data: {
-        galleryId: parseInt(galleryId),
-        storagePath,
-        uploadedById: req.user.id,
+        galleryId: galleryId,
+        filename: req.files.image.name,
+        fileUrl: req.files.image.original_url,
+        uploadedBy: req.user.id,
         status: 'PENDING',
       },
     });
 
     res.status(201).json(image);
   } catch (err) {
+    console.error('Error submitting image:', err);
     res.status(500).json({ error: 'Image submission failed', detail: err.message });
   }
 };
@@ -24,8 +29,12 @@ export const reviewImage = async (req, res) => {
     const { imageId } = req.params;
     const { status } = req.body;
 
+    if (!["APPROVED", "PENDING", "REJECTED"].includes(status)) {
+      throw new Error("Invalid Status")
+    }
+
     const updatedImage = await prisma.image.update({
-      where: { id: parseInt(imageId) },
+      where: { id: imageId },
       data: { status },
     });
 
@@ -38,13 +47,23 @@ export const reviewImage = async (req, res) => {
 export const getGalleryImages = async (req, res) => {
   try {
     const { galleryId } = req.params;
+    const { status } = req.query;
+
+    const where = {
+      galleryId
+    };
+
+    if (["APPROVED", "PENDING", "REJECTED"].includes(status)) {
+      where.status = status;
+    }
 
     const images = await prisma.image.findMany({
-      where: { galleryId: parseInt(galleryId), status: 'APPROVED' },
+      where
     });
 
     res.json(images);
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: 'Failed to fetch gallery images' });
   }
 };

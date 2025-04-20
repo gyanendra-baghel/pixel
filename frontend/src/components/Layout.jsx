@@ -1,21 +1,20 @@
 import { useState } from "react";
-import Sidebar from "./Sidebar";
-import Header from "./Header";
+import { Sidebar } from "./Sidebar";
+import { Header } from "./Header";
 
 const Layout = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // ✅ Sidebar visible initially
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="flex h-screen">
-
-      <div className={`fixed left-0 top-0 h-full bg-white shadow-lg transition-all duration-300 z-40 ${isSidebarOpen ? "w-64" : "w-0"}`}>
-        {isSidebarOpen && <Sidebar />}
-      </div>
-
-
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? "ml-64" : "ml-0"}`}>
-        <Header toggleSidebar={() => setIsSidebarOpen((prev) => !prev)} /> {/* ✅ Pass toggle function */}
-        <div className="flex-1 px-6 pt-20">
+      <Sidebar
+        isOpen={sidebarOpen}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        userRole="admin"
+      />
+      <div className={`flex flex-col flex-1 overflow-hidden`}>
+        <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} onLogout={() => { }} />
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </div>
       </div>

@@ -1,121 +1,78 @@
-import { Link } from "react-router-dom";
-import { FaRegHeart, FaUserFriends } from "react-icons/fa";
-import { BsClockHistory } from "react-icons/bs";
-import { IoAlbumsOutline } from "react-icons/io5";
-import { MdOutlinePhotoLibrary } from "react-icons/md";
-import { AiOutlineDelete, AiOutlineEyeInvisible } from "react-icons/ai";
-import { GiPhotoCamera } from "react-icons/gi";
-import { RiLinksLine } from "react-icons/ri";
-import { Settings } from "lucide-react";
 
-const Sidebar = () => {
+import { Home, Users, ImageIcon, Upload, Grid, X } from "lucide-react"
+import { Link } from "react-router-dom"
+
+
+export function Sidebar({ isOpen, toggleSidebar, userRole }) {
+  // Define navigation items based on user role
+  const getNavItems = () => {
+    switch (userRole) {
+      case "admin":
+        return [
+          { id: "dashboard", label: "Dashboard", icon: Home, href: "/" },
+          { id: "my-uploads", label: "My Uploads", icon: Users, href: "/my-uploads" },
+          { id: "settings", label: "Settings", icon: Users, href: "/settings" },
+        ]
+      case "uploader":
+        return [
+          { id: "my-uploads", label: "My Uploads", icon: Users, href: "/my-uploads" },
+          { id: "gallery", label: "View Gallery", icon: Grid, href: "/gallery" },
+          { id: "settings", label: "Settings", icon: Users, href: "/settings" },
+        ]
+      case "viewer":
+      default:
+        return [
+          { id: "dashboard", label: "Dashboard", icon: Grid, href: "/" },
+          { id: "settings", label: "Settings", icon: Users, href: "/settings" },
+        ]
+    }
+  }
+
+  const navItems = getNavItems()
+
   return (
-    <div className="w-64 h-screen fixed bg-white text-gray-900 p-4 shadow-lg border-r mt-24 border-gray-200 flex flex-col">
-      <div className="mb-6">
-        <h2 className="text-gray-600 text-sm font-semibold mb-2 uppercase">
-          Photos
-        </h2>
-        <ul>
-          <li>
-            <Link to="/library" className="flex items-center p-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
-              <MdOutlinePhotoLibrary className="mr-2 text-blue-500" />
-              Library
-            </Link>
-          </li>
-          <li>
-            <Link to="/like" className="flex items-center p-2 hover:bg-gray-100 rounded-lg">
-              <FaRegHeart className="mr-2 text-red-500" />
-              Favourites
-            </Link>
-          </li>
-          <li>
-            <div className="flex items-center p-2 hover:bg-gray-100 rounded-lg cursor-default">
-              <BsClockHistory className="mr-2 text-yellow-500" />
-              Recents
-            </div>
-          </li>
-        </ul>
-      </div>
+    <>
+      {/* Mobile sidebar backdrop */}
+      {isOpen && <div className="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden" onClick={toggleSidebar} />}
 
-      <div className="mb-6">
-        <h2 className="text-gray-600 text-sm font-semibold mb-2 uppercase">
-          Smart Filters
-        </h2>
-        <ul>
-          <li>
-            <Link to="/people" className="flex items-center p-2 hover:bg-gray-100 rounded-lg">
-              <FaUserFriends className="mr-2 text-green-500" />
-              People
-            </Link>
-          </li>
-          <li>
-            <Link to="/objects" className="flex items-center p-2 hover:bg-gray-100 rounded-lg">
-              <GiPhotoCamera className="mr-2 text-purple-500" />
-              Objects
-            </Link>
-          </li>
-        </ul>
-      </div>
+      {/* Sidebar */}
+      <aside
+        className={`h-full fixed inset-y-0 left-0 z-30 w-64 transform bg-gray-800 text-white transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+      >
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-700">
+          <div className="px-4 py-3">
+            <div className="text-sm text-gray-400">Logged in as</div>
+            <div className="font-medium capitalize">{userRole}</div>
+          </div>
+          <button onClick={toggleSidebar} className="p-1 rounded-md hover:bg-gray-700 lg:hidden">
+            <X size={20} />
+          </button>
+        </div>
 
-      <div className="mb-6">
-        <h2 className="text-gray-600 text-sm font-semibold mb-2 uppercase">
-          Collections
-        </h2>
-        <ul>
-          <li>
-            <Link to="/albums" className="flex items-center p-2 hover:bg-gray-100 rounded-lg">
-              <IoAlbumsOutline className="mr-2 text-purple-500" />
-              Albums
-            </Link>
-          </li>
-          <li>
-            <div className="flex items-center p-2 hover:bg-gray-100 rounded-lg cursor-default">
-              <AiOutlineEyeInvisible className="mr-2 text-gray-500" />
-              Hidden
-            </div>
-          </li>
-          <li>
-            <Link to="/recently-deleted" className="flex items-center p-2 hover:bg-gray-100 rounded-lg">
-              <AiOutlineDelete className="mr-2 text-red-600" />
-              Recently Deleted
-            </Link>
-          </li>
-        </ul>
-      </div>
-
-      <div className="mb-6">
-        <h2 className="text-gray-600 text-sm font-semibold mb-2 uppercase">
-          Sharing
-        </h2>
-        <ul>
-          <li>
-            <Link to="/shared" className="flex items-center p-2 hover:bg-gray-100 rounded-lg">
-              <IoAlbumsOutline className="mr-2 text-teal-500" />
-              Shared Albums
-            </Link>
-          </li>
-          <li>
-            <div className="flex items-center p-2 hover:bg-gray-100 rounded-lg cursor-default">
-              <RiLinksLine className="mr-2 text-blue-500" />
-              iCloud Links
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      {/* Settings Section */}
-      <div className="mt-auto">
-        <ul>
-          <li>
-            <Link to="/settings" className="flex items-center p-2 hover:bg-gray-100 rounded-lg">
-              <Settings className="mr-2 text-gray-500" />
-              Settings
-            </Link>
-          </li>
-        </ul>
-      </div>
-    </div>
-  );
-};
-
-export default Sidebar;
+        <nav className="mt-6">
+          <ul className="space-y-2 px-2">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <li key={item.id}>
+                  <Link
+                    to={item.href}
+                    className={`flex items-center w-full px-4 py-3 rounded-lg transition-colors `}
+                  >
+                    {/* ${currentPage === item.id
+                      ? "bg-gray-700 text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    } */}
+                    <Icon size={20} className="mr-3" />
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+      </aside>
+    </>
+  )
+}

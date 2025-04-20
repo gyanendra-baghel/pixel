@@ -6,7 +6,7 @@ import { getEnv } from "../utils/getEnv.js"
 export const register = async (req, res) => {
   const { name, email, password, role } = req.body;
 
-  if (!name || !email || !password || !["admin", "user"].includes(role)) {
+  if (!name || !email || !password || !["ADMIN", "USER", "UPLOADER"].includes(role)) {
     return res.status(400).json({ message: 'Invalid format credentials' });
   }
 
