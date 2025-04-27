@@ -51,7 +51,7 @@ const ImageUpload = () => {
     const fetchUserUploads = async () => {
       try {
         setIsLoading(true);
-        const response = await axiosInstance.get(`/api/gallery/${galleryId}/images/user`);
+        const response = await axiosInstance.get(`/api/gallery/images/uploads`);
         // Initialize uploads with data from the server
         setUploads(response.data.map(upload => ({
           ...upload,

@@ -67,3 +67,23 @@ export const getGalleryImages = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch gallery images' });
   }
 };
+
+export const getUploadedImages = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(403).json({ error: 'Unauthenticated!' });
+    }
+    const userId = req.user.id;
+
+    const images = await prisma.image.findMany({
+      where: {
+        uploadedBy: userId,
+      },
+    });
+
+    res.json(images);
+  } catch (err) {
+    console.error('Error fetching uploaded images:', err);
+    res.status(500).json({ error: 'Failed to fetch uploaded images' });
+  }
+}

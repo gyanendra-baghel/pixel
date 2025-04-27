@@ -25,7 +25,7 @@ export default function MyUploads() {
   // Check if user is authenticated
   useEffect(() => {
     // Fetch user uploads
-    // fetchUserUploads();
+    fetchUserUploads();
 
     // // Fetch galleries
     fetchGalleries();
@@ -35,11 +35,7 @@ export default function MyUploads() {
   const fetchUserUploads = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("/api/uploads", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-      });
+      const response = await axiosInstance.get("/api/gallery/images/uploads");
       setUploads(response.data);
     } catch (err) {
       console.error("Error fetching uploads:", err);
@@ -108,15 +104,14 @@ export default function MyUploads() {
 
     // Create form data
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("image", file);
     formData.append("galleryId", selectedGallery);
 
     try {
       // Upload file with progress tracking
-      const response = await axios.post("/api/upload", formData, {
+      const response = await axiosInstance.post("/api/gallery/images/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`
         },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -172,11 +167,7 @@ export default function MyUploads() {
     if (isCompleted) {
       // Delete from server if already uploaded
       try {
-        await axios.delete(`/api/uploads/${uploadId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
-        });
+        await axiosInstance.delete(`/api/uploads/${uploadId}`);
       } catch (err) {
         console.error("Error deleting upload:", err);
         setError("Failed to delete upload. Please try again.");
@@ -269,7 +260,7 @@ export default function MyUploads() {
       )}
 
       {/* Upload form */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 max-w-5xl mx-auto">
         <div className="mb-4">
           <label htmlFor="gallery" className="block text-sm font-medium text-gray-700 mb-1">
             Select Gallery
@@ -313,11 +304,11 @@ export default function MyUploads() {
         </div>
       </div>
 
-      {/* Active uploads */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold text-gray-800">Current Uploads</h3>
 
-        {uploads.filter(upload => upload.status === "uploading" || upload.status === "error").length > 0 && (
+      {/* Active uploads */}
+      {uploads.filter(upload => upload.status === "uploading" || upload.status === "error").length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold text-gray-800">Current Uploads</h3>
           <div className="space-y-4">
             {uploads
               .filter(upload => upload.status === "uploading" || upload.status === "error")
@@ -369,8 +360,8 @@ export default function MyUploads() {
                 );
               })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Completed uploads */}
       <div>
@@ -399,7 +390,7 @@ export default function MyUploads() {
                   >
                     <div className="relative h-48">
                       <img
-                        src={`${process.env.REACT_APP_API_URL || ""}${upload.fileUrl}` || "/placeholder.svg"}
+                        src={`http://localhost:5002${upload.fileUrl}` || "/placeholder.svg"}
                         alt={upload.filename}
                         className="w-full h-full object-cover"
                         onError={(e) => {

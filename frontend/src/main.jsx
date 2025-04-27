@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import Signup from './pages/Signup.jsx'
 import Settings from './pages/Settings.jsx'
 import MyUploads from './pages/MyUploads.jsx'
@@ -11,7 +11,7 @@ import ImageUpload from './pages/ImageUpload';
 import GalleryPage from './pages/Gallery.jsx'
 import { Dashboard } from './pages/Dashboard.jsx'
 import LandingPage from './pages/LandingPage.jsx'
-import Login from './pages/Login.jsx'
+import Signin from './pages/Signin.jsx'
 import MainLayout from './components/MainLayout.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 const isAuthenticated = () => {
@@ -19,12 +19,23 @@ const isAuthenticated = () => {
 };
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = () => {
+  const location = useLocation();
+  const isAuth = isAuthenticated();
+  const currentPath = location.pathname;
+
   console.log("ProtectedRoute: Checking authentication");
   console.log("ProtectedRoute: Token:", localStorage.getItem("token"));
-  if (!isAuthenticated()) {
-    return <Navigate to="/landing" />;
+  console.log("ProtectedRoute: Current Path:", currentPath);
+
+  if (!isAuth) {
+    if (currentPath === "/") {
+      return <Navigate to="/landing" />;
+    } else {
+      return <Navigate to="/signin" />;
+    }
   }
+
   return (
     <MainLayout>
       <Outlet />
@@ -36,7 +47,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/signin" element={<Login />} />
+        <Route path="/signin" element={<Signin />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/landing" element={<LandingPage />} />
 
@@ -56,6 +67,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/like" element={<Fev />} />
           <Route path="/shared" element={<SharedAlbum />} /> */}
         </Route>
+        <Route path='*' element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

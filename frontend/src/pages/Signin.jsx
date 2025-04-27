@@ -3,7 +3,7 @@ import { User2 } from "lucide-react";
 import axiosInstance from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,11 +32,11 @@ export default function Login() {
         localStorage.setItem("userRole", data.role.toUpperCase());
       }
 
-      setSuccessMessage("Login successful!");
+      setSuccessMessage("Signin successful!");
       navigate("/");
 
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please check your credentials.");
+      setError(err.response?.data?.message || "Signin failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
