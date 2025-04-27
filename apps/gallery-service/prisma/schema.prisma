@@ -39,14 +39,14 @@ model Image {
 
 model UserAccess {
   id        String    @id @default(uuid())
-  userId    String    // user_id
+  email    String    // user_email
   galleryId String    // gallery_id
   canUpload Boolean   @default(false)
   canView   Boolean   @default(true)
 
   gallery   Gallery   @relation(fields: [galleryId], references: [id])
 
-  @@unique([userId, galleryId]) // Ensure unique access per user per gallery
+  @@unique([email, galleryId]) // Ensure unique access per user per gallery
 }
 
 enum ImageStatus {

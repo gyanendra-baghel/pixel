@@ -3,7 +3,7 @@ import { User2 } from "lucide-react";
 import axiosInstance from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
-export default function LoginForm() {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +29,7 @@ export default function LoginForm() {
       if (response.data) {
         const data = response.data;
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userRole", data.role);
+        localStorage.setItem("userRole", data.role.toUpperCase());
       }
 
       setSuccessMessage("Login successful!");

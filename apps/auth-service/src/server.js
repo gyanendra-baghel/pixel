@@ -4,6 +4,7 @@ import cors from "cors";
 import { prisma } from "./config/prisma.js";
 import { getEnv } from "./utils/getEnv.js";
 import authRoutes from "./routes/authRoutes.js"
+import userRoutes from "./routes/userRoutes.js"
 import errorMiddleware from "./utils/errorMiddleware.js";
 
 const app = express();
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Auth service is running" });
 });
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/user', userRoutes);
 
 // Middleware
 app.use(errorMiddleware);

@@ -11,6 +11,7 @@ import {
   FileX,
   Trash2
 } from "lucide-react";
+import axiosInstance from "../utils/api";
 
 export default function MyUploads() {
   const navigate = useNavigate();
@@ -23,16 +24,11 @@ export default function MyUploads() {
 
   // Check if user is authenticated
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    }
-
     // Fetch user uploads
     // fetchUserUploads();
 
     // // Fetch galleries
-    // fetchGalleries();
+    fetchGalleries();
   }, [navigate]);
 
   // Fetch user uploads
@@ -56,11 +52,7 @@ export default function MyUploads() {
   // Fetch galleries
   const fetchGalleries = async () => {
     try {
-      const response = await axios.get("/api/galleries", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-      });
+      const response = await axiosInstance.get("/api/gallery/access/my-galleries?access=uploader");
       setGalleries(response.data);
       if (response.data.length > 0) {
         setSelectedGallery(response.data[0].id);

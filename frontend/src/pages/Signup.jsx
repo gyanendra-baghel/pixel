@@ -96,7 +96,6 @@ const Signup = () => {
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
               placeholder="Create a password"
-              minLength="8"
             />
             <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
           </div>
@@ -141,7 +140,7 @@ const Signup = () => {
 
           <p className="text-center text-sm text-gray-600 mt-4">
             Already have an account?{' '}
-            <a href="/login" className="text-gray-800 hover:underline font-medium">
+            <a href="/signin" className="text-gray-800 hover:underline font-medium">
               Log in
             </a>
           </p>

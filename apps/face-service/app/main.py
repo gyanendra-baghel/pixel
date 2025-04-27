@@ -19,7 +19,7 @@ async def upload(file: UploadFile = File(...)):
     postgres_utils.save_metadata(image_id)
     return {"message": "Uploaded", "image_id": image_id}
 
-@app.post("/search")
+@app.post("/api/face/search")
 async def search(file: UploadFile = File(...)):
     image_bytes = await file.read()
     query_vector = embedding.extract_embedding(image_bytes).tolist()

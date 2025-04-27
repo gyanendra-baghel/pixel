@@ -2,7 +2,7 @@ import { LogOut, Menu } from "lucide-react"
 
 export function Header({ toggleSidebar, sidebarOpen, onLogout }) {
   return (
-    <header className="bg-gray-900 text-white h-16 flex items-center justify-between px-4 shadow-md z-10">
+    <header className="bg-gray-900 text-white h-16 flex items-center justify-between px-4 shadow-md z-10 lg:hidden">
       <div className="flex items-center">
         <button onClick={toggleSidebar} className="p-1 mr-4 rounded-md hover:bg-gray-700 lg:hidden">
           <Menu size={24} />

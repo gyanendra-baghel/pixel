@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Filter, Check, X, Loader, MessageSquare, Save } from "lucide-react";
+import {
+  Eye, EyeOff, Filter, Check, X, Loader, MessageSquare,
+  Save, Calendar, ArrowLeft, X as Close
+} from "lucide-react";
 import axiosInstance from "../utils/api";
 import { useParams } from "react-router-dom";
 
@@ -11,16 +14,43 @@ export function ReviewImages() {
   const [error, setError] = useState(null);
   const [reviewNote, setReviewNote] = useState({});
   const [submitting, setSubmitting] = useState({});
+  const [fullscreenImage, setFullscreenImage] = useState(null);
+  const [showNoteEditor, setShowNoteEditor] = useState({});
+  const [dateGroups, setDateGroups] = useState({});
 
   // Fetch images on component mount and when filter changes
   useEffect(() => {
     fetchImages();
   }, [filter]);
 
+  // Group images by date when images change
+  useEffect(() => {
+    const grouped = images.reduce((groups, image) => {
+      const date = formatDate(image.uploadedAt, true);
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(image);
+      return groups;
+    }, {});
+    setDateGroups(grouped);
+  }, [images]);
+
+  // Add event listener for escape key to close fullscreen view
+  useEffect(() => {
+    const handleEscapeKey = (e) => {
+      if (e.key === 'Escape' && fullscreenImage) {
+        setFullscreenImage(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscapeKey);
+    return () => window.removeEventListener('keydown', handleEscapeKey);
+  }, [fullscreenImage]);
+
   const fetchImages = async () => {
     try {
       setLoading(true);
-      // Replace with your actual API endpoint
       const response = await axiosInstance.get(`/api/gallery/images/${galleryId}`, {
         params: { status: filter !== "all" ? filter : undefined },
       });
@@ -38,7 +68,6 @@ export function ReviewImages() {
     try {
       setSubmitting(prev => ({ ...prev, [imageId]: true }));
 
-      // Replace with your actual API endpoint
       await axiosInstance.patch(`/api/gallery/images/review/${imageId}`,
         {
           status,
@@ -47,10 +76,12 @@ export function ReviewImages() {
       );
 
       // Update local state to reflect the change
-      setImages(images.filter(img => img.id !== imageId));
+      setImages(images.map(img =>
+        img.id === imageId ? { ...img, status, reviewNote: note || reviewNote[imageId] || "" } : img
+      ));
 
-      // Clear review note for this image
-      setReviewNote(prev => {
+      // Clear review note editor
+      setShowNoteEditor(prev => {
         const updated = { ...prev };
         delete updated[imageId];
         return updated;
@@ -75,19 +106,57 @@ export function ReviewImages() {
     }));
   };
 
+  const openFullscreen = (image) => {
+    setFullscreenImage(image);
+  };
+
+  const closeFullscreen = () => {
+    setFullscreenImage(null);
+    setShowNoteEditor({});
+  };
+
+  const toggleNoteEditor = (imageId) => {
+    setShowNoteEditor(prev => ({
+      ...prev,
+      [imageId]: !prev[imageId]
+    }));
+  };
+
   // Format date
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
+  const formatDate = (dateString, asKey = false) => {
+    if (!dateString) return asKey ? "Unknown Date" : "";
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
-      month: "short",
+      month: asKey ? "short" : "long",
       day: "numeric",
     });
   };
 
+  const getStatusBadgeStyle = (status) => {
+    switch (status) {
+      case "APPROVED":
+        return "bg-green-100 text-green-800";
+      case "REJECTED":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-yellow-100 text-yellow-800";
+    }
+  };
+
+  const getStatusIcon = (status, size = 16) => {
+    switch (status) {
+      case "APPROVED":
+        return <Eye size={size} />;
+      case "REJECTED":
+        return <EyeOff size={size} />;
+      default:
+        return <MessageSquare size={size} />;
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-bold text-gray-800">Review Images</h2>
 
@@ -120,118 +189,203 @@ export function ReviewImages() {
           <p className="text-gray-500">No images found matching the selected filter</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {images.map((image) => (
-            <div
-              key={image.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div className="flex flex-col sm:flex-row">
-                <div className="relative h-48 sm:h-auto sm:w-1/3">
-                  <img
-                    src={`http://localhost:5002${image.fileUrl}`}
-                    alt={image.filename}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/placeholder.svg";
-                    }}
-                  />
-                  <div className="absolute top-2 right-2">
-                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full 
-                      ${image.status === "APPROVED" ? "bg-green-100 text-green-800" :
-                        image.status === "REJECTED" ? "bg-red-100 text-red-800" :
-                          "bg-yellow-100 text-yellow-800"}`}>
-                      {image.status}
-                    </span>
-                  </div>
-                </div>
+        <div className="space-y-8">
+          {Object.entries(dateGroups).map(([date, imageGroup]) => (
+            <div key={date} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="bg-gray-50 p-4 flex items-center border-b">
+                <Calendar size={18} className="text-gray-500 mr-2" />
+                <h3 className="font-medium text-gray-700">{date}</h3>
+                <span className="ml-2 text-gray-500 text-sm">({imageGroup.length} images)</span>
+              </div>
 
-                <div className="p-4 sm:w-2/3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium text-gray-800 truncate" title={image.filename}>
-                        {image.filename}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Uploaded: {formatDate(image.uploadedAt)}
-                      </p>
-                    </div>
-
-                    <div className={`flex items-center ${image.status === "APPROVED" ? "text-green-500" :
-                      image.status === "REJECTED" ? "text-red-500" :
-                        "text-yellow-500"}`}>
-                      {image.status === "APPROVED" ? <Eye size={20} /> :
-                        image.status === "REJECTED" ? <EyeOff size={20} /> :
-                          <MessageSquare size={20} />}
-                    </div>
-                  </div>
-
-                  {/* Review Note Input */}
-                  <div className="mt-3">
-                    <label htmlFor={`note-${image.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                      Review Note:
-                    </label>
-                    <textarea
-                      id={`note-${image.id}`}
-                      value={reviewNote[image.id] !== undefined ? reviewNote[image.id] : image.reviewNote || ""}
-                      onChange={(e) => handleNoteChange(image.id, e.target.value)}
-                      className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-                      rows="2"
-                      placeholder="Add a note for the uploader..."
-                    ></textarea>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2 justify-end">
-                    {image.status === "PENDING" && (
-                      <>
-                        <button
-                          onClick={() => handleReviewAction(image.id, "REJECTED")}
-                          disabled={submitting[image.id]}
-                          className="px-3 py-1 rounded-md text-sm bg-red-100 text-red-600 hover:bg-red-200 flex items-center"
-                        >
-                          {submitting[image.id] ? (
-                            <Loader size={14} className="animate-spin mr-1" />
-                          ) : (
-                            <X size={14} className="mr-1" />
-                          )}
-                          Reject
-                        </button>
-
-                        <button
-                          onClick={() => handleReviewAction(image.id, "APPROVED")}
-                          disabled={submitting[image.id]}
-                          className="px-3 py-1 rounded-md text-sm bg-green-100 text-green-600 hover:bg-green-200 flex items-center"
-                        >
-                          {submitting[image.id] ? (
-                            <Loader size={14} className="animate-spin mr-1" />
-                          ) : (
-                            <Check size={14} className="mr-1" />
-                          )}
-                          Approve
-                        </button>
-                      </>
-                    )}
-
-                    {image.status !== "PENDING" && reviewNote[image.id] !== undefined && (
-                      <button
-                        onClick={() => handleReviewAction(image.id, image.status)}
-                        disabled={submitting[image.id]}
-                        className="px-3 py-1 rounded-md text-sm bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center"
+              <div className="p-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {imageGroup.map((image) => (
+                    <div
+                      key={image.id}
+                      className="flex flex-col"
+                    >
+                      {/* Image Thumbnail */}
+                      <div
+                        className="relative overflow-hidden rounded-lg cursor-pointer group transition-all duration-200"
+                        onClick={() => openFullscreen(image)}
                       >
-                        {submitting[image.id] ? (
-                          <Loader size={14} className="animate-spin mr-1" />
-                        ) : (
-                          <Save size={14} className="mr-1" />
-                        )}
-                        Update Note
-                      </button>
-                    )}
-                  </div>
+                        <div className="aspect-square">
+                          <img
+                            src={`http://localhost:5002${image.fileUrl}`}
+                            alt={image.filename}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/placeholder.svg";
+                            }}
+                          />
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="absolute top-2 right-2">
+                          <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeStyle(image.status)}`}>
+                            {getStatusIcon(image.status, 12)}
+                            <span className="ml-1">{image.status}</span>
+                          </span>
+                        </div>
+
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center transition-all duration-200">
+                          <div className="opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-200">
+                            <button className="bg-white text-gray-800 rounded-full p-2">
+                              <Eye size={20} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Fullscreen Image View */}
+      {fullscreenImage && (
+        <div className="fixed inset-0 top-0 left-0 bg-black bg-opacity-90 z-50 flex flex-col md:flex-row">
+          {/* Image Area */}
+          <div className="flex-1 flex items-center justify-center p-4 relative">
+            <img
+              src={`http://localhost:5002${fullscreenImage.fileUrl}`}
+              alt={fullscreenImage.filename}
+              className="max-h-full max-w-full object-contain"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/placeholder.svg";
+              }}
+            />
+
+            {/* Close Button */}
+            <button
+              onClick={closeFullscreen}
+              className="absolute top-4 right-4 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70"
+            >
+              <Close size={24} />
+            </button>
+          </div>
+
+          {/* Sidebar Details */}
+          <div className="w-full md:w-80 bg-white flex flex-col h-full md:h-auto">
+            <div className="p-4 bg-gray-100 border-b flex items-center justify-between">
+              <button
+                onClick={closeFullscreen}
+                className="md:hidden flex items-center text-gray-600"
+              >
+                <ArrowLeft size={18} className="mr-2" />
+                Back to Gallery
+              </button>
+              <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeStyle(fullscreenImage.status)}`}>
+                {getStatusIcon(fullscreenImage.status)}
+                <span className="ml-1">{fullscreenImage.status}</span>
+              </span>
+            </div>
+
+            <div className="p-4 flex-1 overflow-y-auto">
+              <h3 className="font-medium text-gray-800 mb-2">{fullscreenImage.filename}</h3>
+
+              <div className="text-sm text-gray-600 mb-4">
+                <p>Uploaded: {formatDate(fullscreenImage.uploadedAt)}</p>
+              </div>
+
+              {/* Review Note Display */}
+              {(fullscreenImage.reviewNote || reviewNote[fullscreenImage.id]) && !showNoteEditor[fullscreenImage.id] && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-1">Review Note:</h4>
+                  <div className="bg-gray-50 p-3 rounded border text-sm">
+                    {reviewNote[fullscreenImage.id] || fullscreenImage.reviewNote}
+                  </div>
+                </div>
+              )}
+
+              {/* Note Editor */}
+              {showNoteEditor[fullscreenImage.id] && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-1">Review Note:</h4>
+                  <textarea
+                    value={reviewNote[fullscreenImage.id] !== undefined ? reviewNote[fullscreenImage.id] : fullscreenImage.reviewNote || ""}
+                    onChange={(e) => handleNoteChange(fullscreenImage.id, e.target.value)}
+                    className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    rows="5"
+                    placeholder="Add review notes..."
+                  ></textarea>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="p-4 border-t">
+              {!showNoteEditor[fullscreenImage.id] ? (
+                <button
+                  onClick={() => toggleNoteEditor(fullscreenImage.id)}
+                  className="w-full mb-3 py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md flex justify-center items-center"
+                >
+                  <MessageSquare size={16} className="mr-2" />
+                  {fullscreenImage.reviewNote ? "Edit Note" : "Add Note"}
+                </button>
+              ) : (
+                <div className="flex space-x-2 mb-3">
+                  <button
+                    onClick={() => toggleNoteEditor(fullscreenImage.id)}
+                    className="flex-1 py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleReviewAction(fullscreenImage.id, fullscreenImage.status, reviewNote[fullscreenImage.id]);
+                      toggleNoteEditor(fullscreenImage.id);
+                    }}
+                    disabled={submitting[fullscreenImage.id]}
+                    className="flex-1 py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-md flex justify-center items-center"
+                  >
+                    {submitting[fullscreenImage.id] ? (
+                      <Loader size={16} className="animate-spin mr-2" />
+                    ) : (
+                      <Save size={16} className="mr-2" />
+                    )}
+                    Save
+                  </button>
+                </div>
+              )}
+
+              {fullscreenImage.status === "PENDING" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => handleReviewAction(fullscreenImage.id, "REJECTED")}
+                    disabled={submitting[fullscreenImage.id]}
+                    className="py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded-md flex justify-center items-center"
+                  >
+                    {submitting[fullscreenImage.id] ? (
+                      <Loader size={16} className="animate-spin mr-2" />
+                    ) : (
+                      <X size={16} className="mr-2" />
+                    )}
+                    Reject
+                  </button>
+                  <button
+                    onClick={() => handleReviewAction(fullscreenImage.id, "APPROVED")}
+                    disabled={submitting[fullscreenImage.id]}
+                    className="py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-md flex justify-center items-center"
+                  >
+                    {submitting[fullscreenImage.id] ? (
+                      <Loader size={16} className="animate-spin mr-2" />
+                    ) : (
+                      <Check size={16} className="mr-2" />
+                    )}
+                    Approve
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
