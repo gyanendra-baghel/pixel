@@ -26,6 +26,7 @@ model Image {
   fileUrl     String    // Path on disk or URL from storage service
   status      ImageStatus @default(PENDING) // PENDING | APPROVED | REJECTED
   uploadedAt  DateTime @default(now())
+  caption     String?
 
   uploadedBy  String    // user/admin user_id
 

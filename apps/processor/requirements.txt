@@ -1,0 +1,9 @@
+kafka-python
+qdrant-client
+face_recognition
+Pillow
+numpy
+requests
+fastapi
+uvicorn
+python-multipart

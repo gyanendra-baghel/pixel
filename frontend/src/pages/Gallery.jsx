@@ -159,7 +159,7 @@ export default function GalleryPage() {
     setIsSearching(true);
 
     try {
-      const response = await axiosInstance.get(`/api/gallery/${galleryId}/search?q=${encodeURIComponent(query)}`);
+      const response = await axiosInstance.get(`/api/gallery/images/search?caption=${encodeURIComponent(query)}&galleryId=${galleryId}`);
       setFilteredImages(response.data);
       setSearchResults({
         type: 'text',

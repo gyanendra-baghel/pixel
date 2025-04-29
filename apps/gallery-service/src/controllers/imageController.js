@@ -87,3 +87,68 @@ export const getUploadedImages = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch uploaded images' });
   }
 }
+
+
+export const searchImages = async (req, res) => {
+  try {
+    const { caption, galleryId } = req.query;
+
+    // At least one filter must be provided
+    if (!caption && !galleryId) {
+      return res.status(400).json({
+        error: "At least one filter (caption or galleryId) is required."
+      });
+    }
+
+    const images = await prisma.image.findMany({
+      where: {
+        // Filter by caption (partial match, case-insensitive)
+        ...(caption && {
+          caption: {
+            contains: caption,
+            mode: 'insensitive',
+          },
+        }),
+        // Filter by galleryId (exact match)
+        ...(galleryId && { galleryId }),
+        status: 'APPROVED',
+      },
+    });
+
+    res.json(images);
+  } catch (error) {
+    console.error("Error searching images:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+export const addCaptionToImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { caption } = req.body;
+
+    // Validate input
+    if (!caption) {
+      return res.status(400).json({ error: "Caption is required in the request body." });
+    }
+
+    // Update the caption in the database
+    const updatedImage = await prisma.image.update({
+      where: { id },
+      data: { caption },
+      include: { gallery: true }, // Optional: Include gallery details
+    });
+
+    res.json(updatedImage);
+  } catch (error) {
+    console.error("Error updating caption:", error);
+
+    // Handle "not found" errors
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: "Image not found." });
+    }
+
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
