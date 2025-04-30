@@ -26,10 +26,8 @@ export default function LandingPage() {
           <div className="flex items-center justify-between py-5 md:justify-start md:space-x-10">
             <div className="flex justify-start lg:w-0 lg:flex-1">
               <a href="#" className="flex items-center">
-                <div className="h-8 w-auto text-indigo-600 bg-white rounded-md flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-indigo-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.05-.052.23-.032.28.018l3.494 3.495c.23.23.21 .34-.03.34H19.5c.207 0 .39-.166.39-.375a.375.375 0 00-.39-.375H8.27l-3.495-3.495c-.28-.28-.36-.09-.018.28L2.25 12zm0 0l8.954 8.955c.05.052.23.032.28-.018l3.494-3.495c.23-.23.21-.34-.03-.34H19.5c.207 0 .39.166.39.375a.375.375 0 00-.39.375H8.27l-3.495 3.495c-.28.28-.36.09-.018-.28L2.25 12z" />
-                  </svg>
+                <div className="w-auto text-indigo-600 rounded-md flex items-center justify-center">
+                  <img src="/logo.png" alt="Logo" className="h-6 w-6" />
                 </div>
                 <span className="ml-2 text-xl font-bold text-white">Vision</span>
               </a>

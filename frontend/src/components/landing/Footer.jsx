@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <div className="flex items-center">
-              <Image className="h-8 w-auto text-indigo-400" />
+              <img src="/logo.png" alt="Vision Logo" className="h-8 w-auto" />
               <span className="ml-2 text-xl font-bold text-white">Vision</span>
             </div>
             <p className="text-base text-gray-300">

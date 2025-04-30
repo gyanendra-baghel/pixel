@@ -137,7 +137,6 @@ export const addCaptionToImage = async (req, res) => {
     const updatedImage = await prisma.image.update({
       where: { id },
       data: { caption },
-      include: { gallery: true }, // Optional: Include gallery details
     });
 
     res.json(updatedImage);

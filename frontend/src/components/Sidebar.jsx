@@ -44,7 +44,7 @@ export function Sidebar({ isOpen, toggleSidebar }) {
             <div className="flex items-center justify-between h-16 px-4 bg-gray-800  border-b border-gray-700">
               <div className="flex items-center space-x-3">
                 <div className="flex-shrink-0">
-                  <Image size={28} className="text-indigo-400" />
+                  <img src="/logo.png" alt="Logo" className="h-6 w-auto" />
                 </div>
                 <div className="font-bold text-lg">Vision</div>
               </div>

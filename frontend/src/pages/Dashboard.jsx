@@ -8,6 +8,8 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editGallery, setEditGallery] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState("table"); // table or grid
   const [sortBy, setSortBy] = useState("updatedAt");
@@ -55,11 +57,35 @@ export function Dashboard() {
       const response = await axiosInstance.post("/api/gallery", data);
       setGalleries([...galleries, response.data]);
       setShowCreateModal(false);
-      navigate(`/gallery/${response.data.id}/edit`);
+      navigate(`/gallery/${response.data.id}`);
     } catch (err) {
       console.error("Error creating gallery:", err);
       setError("Failed to create gallery. Please try again.");
     }
+  };
+
+  // Handle gallery update
+  const handleUpdateGallery = async (data) => {
+    try {
+      const response = await axiosInstance.put(`/api/gallery/${editGallery.id}`, data);
+
+      // Update the gallery in the state
+      setGalleries(galleries.map(gallery =>
+        gallery.id === editGallery.id ? response.data : gallery
+      ));
+
+      setShowEditModal(false);
+      setEditGallery(null);
+    } catch (err) {
+      console.error("Error updating gallery:", err);
+      setError("Failed to update gallery. Please try again.");
+    }
+  };
+
+  // Handle opening edit modal
+  const openEditModal = (gallery) => {
+    setEditGallery(gallery);
+    setShowEditModal(true);
   };
 
   // Handle bulk delete
@@ -323,13 +349,13 @@ export function Dashboard() {
                           <Images size={18} />
                         </Link>
                       )}
-                      <Link
-                        to={`/gallery/${gallery.id}/edit`}
+                      <button
+                        onClick={() => openEditModal(gallery)}
                         className="p-1.5 text-amber-600 hover:bg-amber-100 rounded"
                         title="Edit Gallery"
                       >
                         <Pencil size={18} />
-                      </Link>
+                      </button>
                       <button
                         onClick={() => toggleSelection(gallery.id)}
                         className="p-1.5 text-red-600 hover:bg-red-100 rounded"
@@ -389,13 +415,13 @@ export function Dashboard() {
                     >
                       <Eye size={16} />
                     </Link>
-                    <Link
-                      to={`/gallery/${gallery.id}/edit`}
+                    <button
+                      onClick={() => openEditModal(gallery)}
                       className="p-1.5 text-amber-600 hover:bg-amber-100 rounded"
                       title="Edit Gallery"
                     >
                       <Pencil size={16} />
-                    </Link>
+                    </button>
                   </div>
                   {userRole === "ADMIN" && (
                     <div className="flex gap-1">
@@ -473,6 +499,69 @@ export function Dashboard() {
                   className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
                 >
                   Create Gallery
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Gallery Modal */}
+      {showEditModal && editGallery && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4">Edit Gallery</h3>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              handleUpdateGallery({
+                name: formData.get("name"),
+                description: formData.get("description"),
+              });
+            }}>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="edit-name">
+                  Gallery Name
+                </label>
+                <input
+                  type="text"
+                  id="edit-name"
+                  name="name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  placeholder="Enter gallery name"
+                  defaultValue={editGallery.name}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="edit-description">
+                  Description
+                </label>
+                <textarea
+                  id="edit-description"
+                  name="description"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  placeholder="Enter gallery description"
+                  defaultValue={editGallery.description}
+                  rows="3"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditGallery(null);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+                >
+                  Save Changes
                 </button>
               </div>
             </form>
