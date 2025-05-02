@@ -1,9 +1,11 @@
 kafka-python
 qdrant-client
 face_recognition
-Pillow
 numpy
-requests
 fastapi
 uvicorn
 python-multipart
+torch>=2.0.0
+transformers>=4.36.0
+Pillow>=9.0.0
+requests>=2.25.0

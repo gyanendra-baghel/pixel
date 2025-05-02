@@ -1,6 +1,8 @@
 # Use official Node.js image from Docker Hub
 FROM node:18
 
+RUN apt-get update && apt-get install -y netcat-openbsd
+
 # Set working directory in the container
 WORKDIR /app
 

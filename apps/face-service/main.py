@@ -16,7 +16,11 @@ STORAGE_SERVICE_URL = os.getenv("STORAGE_SERVICE_URL", "http://uploader:8000")
 # === FASTAPI App ===
 app = FastAPI()
 
-@app.post("/search-face/")
+@app.get("/api/face/health")
+def health():
+    return JSONResponse(content={"health": "good"})
+
+@app.post("/api/face/search")
 async def search_face(file: UploadFile = File(...)):
     local_path = f"/tmp/{file.filename}"
     
@@ -59,7 +63,7 @@ def consume_images():
         if not image_id:
             print("Image Id not Provided")
             continue
-        else if not image_path:
+        elif not image_path:
             print("Image Path not Provided")
             continue
 
@@ -93,4 +97,4 @@ if __name__ == "__main__":
 
     # Start API server (FastAPI)
     print("Starting Server")
-    uvicorn.run(app, host="0.0.0.0", port=8010)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8010)))
