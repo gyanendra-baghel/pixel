@@ -16,7 +16,7 @@ const createServiceProxy = (target) => createProxyMiddleware({
 app.use('/api/auth', createServiceProxy('http://auth-service:5001/api/auth'));
 app.use('/api/storage', createServiceProxy('http://storage-service:5002/api/storage'));
 app.use('/api/gallery', createServiceProxy('http://gallery-service:5003/api/gallery'));
-app.use('/api/face', createServiceProxy('http://face-service:5010/api/face'));
+app.use('/api/face', createServiceProxy('http://face-service:8010/api/face'));
 
 // 🚨 Fallback Error Handler
 app.use((err, req, res, next) => {

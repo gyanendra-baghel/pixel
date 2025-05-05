@@ -3,7 +3,7 @@ import json
 import os
 import requests
 import threading
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 import uvicorn
 
@@ -21,7 +21,7 @@ def health():
     return JSONResponse(content={"health": "good"})
 
 @app.post("/api/face/search")
-async def search_face(file: UploadFile = File(...)):
+async def search_face(file: UploadFile = File(...), gallery_id: str = Form(None)):
     local_path = f"/tmp/{file.filename}"
     
     with open(local_path, "wb") as f:
@@ -30,7 +30,7 @@ async def search_face(file: UploadFile = File(...)):
 
     try:
         # Search in face database
-        results = search_faces(local_path)
+        results = search_faces(local_path, gallery_id=gallery_id)
         return JSONResponse(content={"results": results})
 
     except Exception as e:
@@ -57,14 +57,15 @@ def consume_images():
         data = message.value
         image_path = data["image_path"]
         image_id = data["image_id"]
+        gallery_id = data["gallery_id"]
 
         print(f"Processing image: {image_path}")
 
-        if not image_id:
-            print("Image Id not Provided")
-            continue
-        elif not image_path:
+        if not image_path:
             print("Image Path not Provided")
+            continue
+        elif not gallery_id:
+            print("Gallery Id not provided")
             continue
 
         image_url = f"{STORAGE_SERVICE_URL}/{image_path}"
@@ -79,8 +80,8 @@ def consume_images():
             with open(local_path, 'wb') as f:
                 f.write(response.content)
 
-            index_faces(local_path, image_path)
-            caption = generate_caption(local_path)
+            index_faces(local_path, image_path, image_id, gallery_id)
+            caption = generate_caption(local_path, image_id)
             print("Caption:", caption)
 
         except Exception as e:

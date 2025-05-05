@@ -1,4 +1,5 @@
 import prisma from '../config/prismaClient.js';
+import { producer } from "../config/kafka.js"
 
 export const submitImage = async (req, res) => {
   try {
@@ -15,6 +16,17 @@ export const submitImage = async (req, res) => {
         uploadedBy: req.user.id,
         status: 'PENDING',
       },
+    });
+
+    await producer.send({
+      topic: "new-gallery-img",
+      messages: [{
+        value: JSON.stringify({
+          image_path: req.files.image.original_url,
+          image_id: image.id,
+          gallery_id: galleryId
+        })
+      }]
     });
 
     res.status(201).json(image);

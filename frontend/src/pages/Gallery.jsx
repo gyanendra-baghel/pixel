@@ -120,7 +120,7 @@ export default function GalleryPage() {
       setSearchParams({});
       return;
     }
-
+    setError(null)
     setSearchLoading(true);
     setIsSearching(true);
 
@@ -149,27 +149,37 @@ export default function GalleryPage() {
 
     setSearchLoading(true);
     setIsSearching(true);
+    setError(null)
 
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append('file', file);
+    formData.append("gallery_id", galleryId);
 
     try {
-      const response = await axiosInstance.post(`/api/gallery/${galleryId}/search/image`, formData, {
+      // add gallery_id constrain
+      const response = await axiosInstance.post(`/api/face/search`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
 
-      setFilteredImages(response.data);
-      setSearchResults({
-        type: 'image',
-        query: file.name,
-        count: response.data.length
-      });
+      const results = response.data.results;
 
-      // Clear text search when using image search
-      setTextQuery("");
-      setSearchParams({});
+      if (results.error) {
+        setError("No face in image")
+        setSearchResults(null);
+      } else {
+        setFilteredImages(results.matches);
+        setSearchResults({
+          type: 'image',
+          query: file.name,
+          count: results.matches.length
+        });
+
+        // Clear text search when using image search
+        setTextQuery("");
+        setSearchParams({});
+      }
     } catch (err) {
       console.error("Error searching by image:", err);
       setError("Image search failed. Please try again.");

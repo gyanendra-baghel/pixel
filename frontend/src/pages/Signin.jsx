@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { User2 } from "lucide-react";
 import axiosInstance from "../utils/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
@@ -117,9 +117,9 @@ export default function Signin() {
           <div className="text-center pt-4">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
-              <button type="button" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium">
                 Sign up
-              </button>
+              </Link>
             </p>
           </div>
 

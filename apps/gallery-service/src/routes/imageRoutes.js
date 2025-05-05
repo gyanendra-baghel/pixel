@@ -11,7 +11,6 @@ router.get('/uploads', authenticateUser, getUploadedImages);
 router.get('/search', authenticateUser, searchImages);
 router.patch('/review/:imageId', authenticateUser, authorizeRole(['ADMIN']), reviewImage);
 router.get('/:galleryId', authenticateUser, getGalleryImages);
-router.post('/:id/caption', authenticateUser, addCaptionToImage);
-
+router.post('/:id/caption', addCaptionToImage);
 
 export default router;

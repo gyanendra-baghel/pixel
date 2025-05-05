@@ -3,7 +3,7 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      - ZOOKEEPER_CLIENT_PORT=2181
     healthcheck:
       test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181 | grep imok"]
       interval: 10s
@@ -21,12 +21,12 @@ services:
       - "9092:9092"
       - "9101:9101"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
     healthcheck:
       test: ["CMD", "bash", "-c", "kafka-topics --bootstrap-server kafka:9092 --list || exit 1"]
       interval: 30s
@@ -39,9 +39,9 @@ services:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: vision_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB= vision_db
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -96,6 +96,7 @@ services:
       - JWT_SECRET=your_jwt_secret
       - NODE_ENV=development
       - DATABASE_URL=postgres://postgres:password@postgres:5432/gallery_db
+      - KAFKA_BROKER=kafka:9092
     ports:
       - "5003:5003"
     networks:
@@ -108,10 +109,11 @@ services:
     ports:
       - "8010:8010"
     environment:
-      PORT: 8010
-      # KAFKA_BROKER: kafka:9092
-      QDRANT_HOST: qdrant
-      STORAGE_SERVICE_URL: http://storage-service:5002
+      - PORT=8010
+      - KAFKA_BROKER=kafka:9092
+      - QDRANT_HOST=qdrant
+      - STORAGE_SERVICE_URL=http://storage-service:5002
+      - CAPTION_API=http://gallery-service:5003/api/gallery/images
     depends_on:
       - auth-service
       - storage-service

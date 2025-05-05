@@ -1,10 +1,9 @@
 import { Kafka } from "kafkajs";
-import dotenv from "dotenv";
-dotenv.config();
+import { getEnv } from "../utils/getEnv.js"
 
 const kafka = new Kafka({
   clientId: "uploader-service",
-  brokers: [process.env.KAFKA_BROKER || "localhost:9092"],
+  brokers: [getEnv("KAFKA_BROKER")],
 });
 
 export const producer = kafka.producer();
