@@ -28,7 +28,7 @@ def generate_caption(local_path, image_id):
     if CAPTION_API:
         try:
             response = requests.post(
-                CAPTION_API+f'/{image_id}/caption',
+                CAPTION_API+f'/caption/{image_id}',
                 json={"image_id": image_id, "caption": caption},
                 timeout=5
             )

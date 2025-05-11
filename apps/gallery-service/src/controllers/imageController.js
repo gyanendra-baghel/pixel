@@ -105,25 +105,26 @@ export const searchImages = async (req, res) => {
   try {
     const { caption, galleryId } = req.query;
 
+    console.log("Caption", caption);
+    console.log("Gallery Id", galleryId)
+
     // At least one filter must be provided
-    if (!caption && !galleryId) {
+    if (!caption || !galleryId) {
       return res.status(400).json({
-        error: "At least one filter (caption or galleryId) is required."
+        error: "caption and galleryId are required."
       });
     }
 
     const images = await prisma.image.findMany({
       where: {
         // Filter by caption (partial match, case-insensitive)
-        ...(caption && {
-          caption: {
-            contains: caption,
-            mode: 'insensitive',
-          },
-        }),
+        caption: {
+          contains: caption,
+          mode: 'insensitive',
+        },
         // Filter by galleryId (exact match)
-        ...(galleryId && { galleryId }),
-        status: 'APPROVED',
+        // ...(galleryId && { galleryId }),
+        // status: 'APPROVED',
       },
     });
 
@@ -139,6 +140,9 @@ export const addCaptionToImage = async (req, res) => {
   try {
     const { id } = req.params;
     const { caption } = req.body;
+
+    console.log("Addded Caption", id);
+    console.log("Caption:", caption);
 
     // Validate input
     if (!caption) {

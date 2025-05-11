@@ -15,7 +15,7 @@ app.use(fileUpload());
 
 // Routes
 app.use('/api/gallery', authenticateUser, galleryRoutes);
-app.use('/api/gallery/images', authenticateUser, imageRoutes);
+app.use('/api/gallery/images', imageRoutes);
 app.use('/api/gallery/access', authenticateUser, accessRoutes);
 
 // Global error handler for unhandled routes or errors

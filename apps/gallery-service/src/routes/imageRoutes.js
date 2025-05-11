@@ -10,7 +10,7 @@ router.post('/', authenticateUser, imageUploadMiddleware("image"), submitImage);
 router.get('/uploads', authenticateUser, getUploadedImages);
 router.get('/search', authenticateUser, searchImages);
 router.patch('/review/:imageId', authenticateUser, authorizeRole(['ADMIN']), reviewImage);
+router.post('/caption/:id', addCaptionToImage);
 router.get('/:galleryId', authenticateUser, getGalleryImages);
-router.post('/:id/caption', addCaptionToImage);
 
 export default router;
