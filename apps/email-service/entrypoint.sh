@@ -1,10 +1,4 @@
 #!/bin/sh
-echo "📦 Generating Prisma files..."
-npx prisma generate
-
-echo "📦 Running DB migrations..."
-npx prisma migrate deploy
-
 # Kafka host and port
 KAFKA_HOST=kafka
 KAFKA_PORT=9092

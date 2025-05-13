@@ -9,8 +9,8 @@ const router = express.Router();
 router.post('/', authenticateUser, imageUploadMiddleware("image"), submitImage);
 router.get('/uploads', authenticateUser, getUploadedImages);
 router.get('/search', authenticateUser, searchImages);
+router.post('/caption', addCaptionToImage);
 router.patch('/review/:imageId', authenticateUser, authorizeRole(['ADMIN']), reviewImage);
-router.post('/caption/:id', addCaptionToImage);
 router.get('/:galleryId', authenticateUser, getGalleryImages);
 
 export default router;

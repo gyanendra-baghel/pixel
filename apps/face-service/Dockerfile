@@ -22,4 +22,5 @@ EXPOSE 8010
 
 COPY wait-for-kafka.sh /wait-for-kafka.sh
 RUN chmod +x /wait-for-kafka.sh
-ENTRYPOINT ["/wait-for-kafka.sh", "python", "-u", "main.py"]
+ENTRYPOINT ["/wait-for-kafka.sh"]
+CMD ["python", "-u", "main.py"]

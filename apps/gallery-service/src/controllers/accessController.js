@@ -41,6 +41,15 @@ export const grantAccessBulk = async (req, res) => {
       throw new Error("Auth service is not reachable");
     }
 
+    try {
+      const response = await axios.post("http://email-service:5004/api/email/send-users-email", {
+        emails: foundEmails
+      });
+      // console.log("Response from auth service:", response.data);
+    } catch (error) {
+      throw new Error("Email service is not reachable");
+    }
+
     // Grant access only to found emails
     const createdAccesses = await Promise.all(
       foundEmails.map((email) =>

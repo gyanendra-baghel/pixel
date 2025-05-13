@@ -94,8 +94,11 @@ def consume_images():
 # === MAIN STARTUP ===
 if __name__ == "__main__":
     # Start Kafka Consumer in a thread
+    print("Running Consumer Thread...")
+
     threading.Thread(target=consume_images, daemon=True).start()
 
     # Start API server (FastAPI)
     print("Starting Server")
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8010)))
+    print("Server started")

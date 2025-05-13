@@ -44,7 +44,7 @@ def index_faces(local_path, image_path, image_id, gallery_id):
     print(f"Indexed {len(points)} faces from {image_path} with image_id {image_id}")
 
 
-def search_faces(image_path, top_k=5, gallery_id=None):
+def search_faces(image_path, top_k=50, gallery_id=None):
     image = face_recognition.load_image_file(image_path)
     face_locations = face_recognition.face_locations(image)
 
@@ -69,21 +69,29 @@ def search_faces(image_path, top_k=5, gallery_id=None):
             ]
         }
 
-    search_result = client.search(
+    # Fetch more results to allow filtering of duplicates
+    raw_results = client.search(
         collection_name=COLLECTION_NAME,
         query_vector=query_vector,
-        limit=top_k,
+        limit=top_k * 5,  # Overfetch to compensate for duplicates
         with_payload=True,
         query_filter=query_filter
     )
 
-    faces = []
-    for hit in search_result:
-        faces.append({
-            "score": hit.score,
-            "id": hit.payload.get("image_id"),
-            "fileUrl": hit.payload.get("fileUrl"),
-            "face_index": hit.payload.get("face_index")
-        })
+    seen_image_ids = set()
+    distinct_faces = []
 
-    return {"matches": faces}
+    for hit in raw_results:
+        image_id = hit.payload.get("image_id")
+        if image_id not in seen_image_ids:
+            seen_image_ids.add(image_id)
+            distinct_faces.append({
+                "score": hit.score,
+                "id": image_id,
+                "fileUrl": hit.payload.get("fileUrl"),
+                "face_index": hit.payload.get("face_index")
+            })
+        if len(distinct_faces) >= top_k:
+            break
+
+    return {"matches": distinct_faces}

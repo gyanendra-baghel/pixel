@@ -138,10 +138,9 @@ export const searchImages = async (req, res) => {
 
 export const addCaptionToImage = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { caption } = req.body;
+    const { image_id, caption } = req.body;
 
-    console.log("Addded Caption", id);
+    console.log("Addded Caption", image_id);
     console.log("Caption:", caption);
 
     // Validate input
@@ -151,7 +150,7 @@ export const addCaptionToImage = async (req, res) => {
 
     // Update the caption in the database
     const updatedImage = await prisma.image.update({
-      where: { id },
+      where: { id: image_id },
       data: { caption },
     });
 

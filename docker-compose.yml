@@ -1,6 +1,6 @@
-
 services:
   zookeeper:
+    container_name: vision_zookeeper
     image: confluentinc/cp-zookeeper:7.4.0
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
@@ -13,6 +13,7 @@ services:
       - backend
 
   kafka:
+    container_name: vision_kafka
     image: confluentinc/cp-kafka:7.4.0
     depends_on:
       - zookeeper
@@ -36,12 +37,13 @@ services:
       - backend
 
   postgres:
+    container_name: vision_postgres
     image: postgres:15
     restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB= vision_db
+      - POSTGRES_DB=vision_db
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -50,15 +52,19 @@ services:
       - "5432:5432"
 
   qdrant:
+    container_name: vision_qdrant
     image: qdrant/qdrant
     ports:
       - "6333:6333"
+    environment:
+      - QDRANT__STORAGE__STORAGE_PATH=/qdrant/storage
     volumes:
       - qdrant_data:/qdrant/storage
     networks:
       - backend
-    
+
   auth-service:
+    container_name: vision_auth-service
     build: ./apps/auth-service
     ports:
       - "5001:5001"
@@ -74,6 +80,7 @@ services:
       - postgres
 
   storage-service:
+    container_name: vision_storage-service
     build: ./apps/storage-service
     ports:
       - "5002:5002"
@@ -88,8 +95,9 @@ services:
       - backend
     depends_on:
       - postgres
-  
+
   gallery-service:
+    container_name: vision_gallery-service
     build: ./apps/gallery-service
     environment:
       - PORT=5003
@@ -104,7 +112,25 @@ services:
     depends_on:
       - postgres
 
+  email-service:
+    container_name: vision_email-service
+    build: ./apps/email-service
+    environment:
+      - PORT=5004
+      - JWT_SECRET=your_jwt_secret
+      - NODE_ENV=development
+      - KAFKA_BROKER=kafka:9092
+      - "SMTP_USER=rohansingh91929@gmail.com"
+      - "SMTP_PASS=hgxx rxvy kilu riev"
+    ports:
+      - "5004:5004"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
   face-service:
+    container_name: vision_face-service
     build: ./apps/face-service
     ports:
       - "8010:8010"
@@ -113,7 +139,7 @@ services:
       - KAFKA_BROKER=kafka:9092
       - QDRANT_HOST=qdrant
       - STORAGE_SERVICE_URL=http://storage-service:5002
-      - CAPTION_API=http://gallery-service:5003/api/gallery/images
+      - CAPTION_API=http://gallery-service:5003/api/gallery/images/caption
     depends_on:
       - auth-service
       - storage-service
@@ -121,6 +147,7 @@ services:
       - backend
 
   gateway:
+    container_name: vision_gateway
     build: ./gateway
     ports:
       - "5000:5000"

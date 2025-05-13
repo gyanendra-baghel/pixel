@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Kafka host and port
 KAFKA_HOST=kafka
 KAFKA_PORT=9092
@@ -14,4 +16,5 @@ until nc -z -v -w30 $KAFKA_HOST $KAFKA_PORT; do
 done
 
 echo "Kafka is up!"
+echo "🚀 Starting app... $@"
 exec "$@"
