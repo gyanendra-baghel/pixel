@@ -1,4 +1,4 @@
-import { prisma } from '../prismaClient.js';
+import prisma from '../config/prismaClient.js';
 
 export const createGallery = async (userId, data) => {
   return await prisma.gallery.create({

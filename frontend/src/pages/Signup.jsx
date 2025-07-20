@@ -112,7 +112,6 @@ const Signup = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
             >
               <option value="USER">Regular User</option>
-              <option value="UPLOADER">Content Uploader</option>
               <option value="ADMIN">Administrator</option>
             </select>
             <p className="mt-1 text-xs text-gray-500">

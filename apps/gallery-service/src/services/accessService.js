@@ -1,4 +1,4 @@
-import { prisma } from '../prismaClient.js';
+import prisma from '../config/prismaClient.js';
 
 export const grantAccess = async (userId, galleryId, canUpload = false, canView = true) => {
   return await prisma.userAccess.upsert({

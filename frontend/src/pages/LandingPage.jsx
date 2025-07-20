@@ -27,9 +27,8 @@ export default function LandingPage() {
             <div className="flex justify-start lg:w-0 lg:flex-1">
               <a href="#" className="flex items-center">
                 <div className="w-auto text-indigo-600 rounded-md flex items-center justify-center">
-                  <img src="/logo.png" alt="Logo" className="h-6 w-6" />
+                  <img src="/logo.png" alt="Logo" className="h-6" />
                 </div>
-                <span className="ml-2 text-xl font-bold text-white">Vision</span>
               </a>
             </div>
 

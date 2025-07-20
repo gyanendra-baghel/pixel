@@ -44,9 +44,12 @@ export const getGallery = async (req, res) => {
 export const deleteGallery = async (req, res) => {
   try {
     const { id } = req.params;
+    await prisma.userAccess.deleteMany({ where: { galleryId: id } });
+    await prisma.image.deleteMany({ where: { galleryId: id } });
     await prisma.gallery.delete({ where: { id } });
     res.json({ message: 'Gallery deleted' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Failed to delete gallery' });
   }
 };

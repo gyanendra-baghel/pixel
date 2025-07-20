@@ -46,7 +46,7 @@ export default function ImageModal({
             <img
               src={`http://localhost:5002${image.fileUrl}`}
               alt={image.filename}
-              className="max-h-full max-w-full object-contain"
+              className="max-w-96 max-h-96 object-contain"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = "/placeholder.svg";

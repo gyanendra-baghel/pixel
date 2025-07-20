@@ -166,3 +166,18 @@ export const addCaptionToImage = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
+export const deleteImage = async (req, res) => {
+  try {
+    const { imageId } = req.params;
+
+    await prisma.image.delete({
+      where: { id: imageId },
+    });
+
+    res.status(204).send();
+  } catch (err) {
+    console.error('Error deleting image:', err);
+    res.status(500).json({ error: 'Failed to delete image' });
+  }
+};

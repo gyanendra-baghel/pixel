@@ -19,14 +19,14 @@ const sendEmail = async (req, res) => {
 
 const sendMultiUsersEmail = async (req, res) => {
   try {
-    const { emails, subject, text } = req.body;
+    const { emails, subject, text, html } = req.body;
 
     if (!emails || !subject || !text) {
       return res.status(400).json({ error: "Missing required fields (users, subject, text)" });
     }
 
     for (const email of emails) {
-      await emailService.enqueueEmail({ to: email, subject, text });
+      await emailService.enqueueEmail({ to: email, subject, text, html });
     }
 
     return res.status(200).json({ message: "Email requests received and queued for processing." });

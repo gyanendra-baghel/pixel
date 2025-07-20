@@ -167,7 +167,7 @@ export default function MyUploads() {
     if (isCompleted) {
       // Delete from server if already uploaded
       try {
-        await axiosInstance.delete(`/api/uploads/${uploadId}`);
+        await axiosInstance.delete(`/api/gallery/images/${uploadId}`);
       } catch (err) {
         console.error("Error deleting upload:", err);
         setError("Failed to delete upload. Please try again.");

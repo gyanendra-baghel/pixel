@@ -11,22 +11,22 @@ const FAQ = () => {
             Frequently asked questions
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-            Everything you need to know about Vision
+            Everything you need to know about Pixel
           </p>
         </div>
 
         <div className="mt-12">
           <dl className="space-y-10 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-12 md:space-y-0">
             <div>
-              <dt className="text-lg font-medium leading-6 text-gray-900">How secure is Vision?</dt>
+              <dt className="text-lg font-medium leading-6 text-gray-900">How secure is Pixel?</dt>
               <dd className="mt-2 text-base text-gray-500">
-                Vision employs enterprise-grade security with end-to-end encryption, role-based access controls, and regular security audits to ensure your visual assets remain protected at all times.
+                Pixel employs enterprise-grade security with end-to-end encryption, role-based access controls, and regular security audits to ensure your visual assets remain protected at all times.
               </dd>
             </div>
             <div>
-              <dt className="text-lg font-medium leading-6 text-gray-900">Can I integrate Vision with our existing tools?</dt>
+              <dt className="text-lg font-medium leading-6 text-gray-900">Can I integrate Pixel with our existing tools?</dt>
               <dd className="mt-2 text-base text-gray-500">
-                Yes! Vision offers API access and integrations with popular design tools, content management systems, and team collaboration platforms.
+                Yes! Pixel offers API access and integrations with popular design tools, content management systems, and team collaboration platforms.
               </dd>
             </div>
             <div>

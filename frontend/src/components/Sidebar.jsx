@@ -46,7 +46,7 @@ export function Sidebar({ isOpen, toggleSidebar }) {
                 <div className="flex-shrink-0">
                   <img src="/logo.png" alt="Logo" className="h-6 w-auto" />
                 </div>
-                <div className="font-bold text-lg">Vision</div>
+                {/* <div className="font-bold text-lg">Pixel</div> */}
               </div>
               <button onClick={toggleSidebar} className="p-1 rounded-md hover:bg-gray-700 lg:hidden">
                 <X size={20} />

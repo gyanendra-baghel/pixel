@@ -16,13 +16,13 @@ function GalleryHeader({ galleryInfo, galleryId }) {
             <p className="text-gray-600 mt-1 max-w-3xl">{galleryInfo.description}</p>
           )}
         </div>
-        <Link
+        {/* <Link
           to={`/gallery/${galleryId}/upload`}
           className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
         >
           <Upload size={18} />
           Upload
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

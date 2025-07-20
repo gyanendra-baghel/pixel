@@ -12,13 +12,14 @@ const ensureProducerConnected = async () => {
   }
 };
 
-const sendEmail = async ({ to, subject, text }) => {
+const sendEmail = async ({ to, subject, text, html }) => {
   try {
     const info = await transporter.sendMail({
       from: process.env.SMTP_USER,
       to,
       subject,
-      text
+      text,
+      html,
     });
 
     console.log(`📩 Email sent to ${to}: ${info.messageId}`);

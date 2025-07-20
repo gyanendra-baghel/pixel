@@ -7,7 +7,7 @@ export function Header({ toggleSidebar, sidebarOpen, onLogout }) {
         <button onClick={toggleSidebar} className="p-1 mr-4 rounded-md hover:bg-gray-700 lg:hidden">
           <Menu size={24} />
         </button>
-        <h1 className="text-xl font-bold">Vision Ai</h1>
+        <h1 className="text-xl font-bold">Pixel</h1>
       </div>
 
       <div className="flex items-center">

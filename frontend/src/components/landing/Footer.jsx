@@ -10,8 +10,8 @@ const Footer = () => {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <div className="flex items-center">
-              <img src="/logo.png" alt="Vision Logo" className="h-8 w-auto" />
-              <span className="ml-2 text-xl font-bold text-white">Vision</span>
+              <img src="/logo.png" alt="Pixel Logo" className="h-8 w-auto" />
+              {/* <span className="ml-2 text-xl font-bold text-white">Pixel</span> */}
             </div>
             <p className="text-base text-gray-300">
               Secure, organized image management for teams of all sizes.
@@ -152,7 +152,7 @@ const Footer = () => {
         </div>
         <div className="mt-12 border-t border-gray-700 pt-8">
           <p className="text-base text-gray-400 xl:text-center">
-            &copy; 2025 Vision, Inc. All rights reserved.
+            &copy; 2025 Pixel, Inc. All rights reserved.
           </p>
         </div>
       </div>

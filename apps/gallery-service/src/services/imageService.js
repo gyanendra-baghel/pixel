@@ -1,4 +1,4 @@
-import { prisma } from '../prismaClient.js';
+import prisma from '../config/prismaClient.js';
 
 export const uploadImage = async (userId, galleryId, filename, fileUrl) => {
   return await prisma.image.create({

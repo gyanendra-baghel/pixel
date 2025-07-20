@@ -3,7 +3,6 @@ import cors from 'cors';
 import galleryRoutes from './routes/galleryRoutes.js';
 import imageRoutes from './routes/imageRoutes.js';
 import accessRoutes from './routes/accessRoutes.js';
-import { authenticateUser } from './middleware/authMiddleware.js';
 import { getEnv } from './utils/getEnv.js';
 import prisma from './config/prismaClient.js';
 import fileUpload from 'express-fileupload';
@@ -14,9 +13,9 @@ app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(fileUpload());
 
 // Routes
-app.use('/api/gallery', authenticateUser, galleryRoutes);
+app.use('/api/gallery', galleryRoutes);
 app.use('/api/gallery/images', imageRoutes);
-app.use('/api/gallery/access', authenticateUser, accessRoutes);
+app.use('/api/gallery/access', accessRoutes);
 
 // Global error handler for unhandled routes or errors
 app.use((err, req, res, next) => {
